@@ -1,0 +1,376 @@
+---
+title: "学名付きの系統樹ラベルを整える"
+execute:
+  echo: true
+  warning: false
+  message: false
+  fig-dpi: 350
+embed-resources: true
+vignette: >
+  %\VignetteIndexEntry{学名付きの系統樹ラベルを整える}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+この vignette では、学名付きラベルを読みやすく整形しつつ、 `ggtree` で tip label を綺麗に配置する最小例を示します。
+
+学名部分はすべてダミーデータです。
+
+## 事前準備
+
+この章で使う主な関数:
+
+-   `style_tree_label()`: 学名ラベルを Markdown 形式で整形します。
+-   `format_node_support()`: node support 値を閾値で整形します。
+-   `geom_marquee()`: Markdown ラベルを安定して描画します。
+-   `.tiplab_*()`: tip label の x 座標と補助線を計算します。
+
+```{r}
+#| label: setup
+library(tidyverse)
+library(ape)
+library(ggtree)
+library(marquee)
+library(ggbipartite)
+```
+
+## ダミー系統樹とラベルを用意する
+
+```{r}
+#| label: make-dummy-tree
+set.seed(20260305)
+
+tree_raw <- rtree(10)
+tree_raw$tip.label <- c(
+  "Cortinarius-violaceus_AB123456.1",
+  "Laccaria-bicolor_MN234567.1",
+  "Russula-cyanoxantha_LC345678.1",
+  "mycobiont_of_Fagus-crenata_ORM_OTU1_Psathyrella",
+  "mycobiont_of_Quercus-crispula_ORM_OTU2_Tomentella",
+  "mycobiont_of_Betula-ermanii_ORM_OTU3_Thelephoraceae",
+  "Amanita-muscaria_OP456789.1",
+  "Clavulina-cinerea_PP567890.1",
+  "Inocybe-geophylla_QQ678901.1",
+  "Hebeloma-crustuliniforme_RR789012.1"
+)
+
+support_pool <- c(
+  "98/100", "95/99", "92/97", "88/96", "84/95",
+  "79/90", "70/86", "66/82", "61/80"
+)
+tree_raw$node.label <- support_pool[seq_len(tree_raw$Nnode)]
+
+tree_rooted <- root(
+  phy = tree_raw,
+  outgroup = tree_raw$tip.label[1],
+  resolve.root = TRUE
+)
+```
+
+## 学名とサポート値を整形する
+
+```{r}
+#| label: style-labels
+tree_pretty <- tree_rooted
+
+tree_pretty$tip.label <- tree_rooted$tip.label |>
+  str_replace_all("_ORM_", "_(ORM)_") |>
+  str_remove("\\.1$") |>
+  style_tree_label(last_taxon_rank = "genus")
+
+tree_pretty$node.label <- format_node_support(
+  x = tree_rooted$node.label,
+  sh_alrt_cutoff = 80,
+  boot_cutoff = 95
+)
+
+label_preview <- tibble(
+  raw_label = tree_rooted$tip.label,
+  styled_label = tree_pretty$tip.label
+)
+
+label_preview
+```
+
+実務では、系統推定結果を `phylo` として読み込み、 必要なら root を設定したうえで tibble に変換し、 `label` 列を `mutate() + case_when()` で整形してから `phylo` に戻す流れが扱いやすいです。\
+`mycobiont`・サポート値・その他の学名を 1 箇所で分岐できるため、 可視化前の前処理を集約できます。
+
+```{r}
+#| label: practical-label-workflow
+#| eval: false
+tree_pretty_from_file <- read.tree("path/to/your_tree.treefile") |>
+  phytools::reroot(node.number = 31) |> # Set root at a target clade.
+  as_tibble() |>
+  mutate(
+    label = str_replace_all(
+      .data$label,
+      "_ORM_",
+      "(ORM)"
+    ),
+    label = str_remove(.data$label, "\\.1$"),
+    label = case_when(
+      str_detect(.data$label, "mycobiont") ~
+        style_tree_label(.data$label),
+      str_detect(
+        .data$label,
+        "^\\d+(?:\\.\\d+)?/\\d+(?:\\.\\d+)?$"
+      ) ~ .data$label,
+      .default = style_sciname(.data$label)
+    )
+  ) |>
+  as.phylo()
+```
+
+この方法だと、`ggtree()` 側では整形済みラベルをそのまま使えるため、 プロット層で文字列処理を書く必要が減り、図コードの可読性が上がります。
+
+## align = FALSE: tipごとにラベルを寄せる
+
+```{r}
+#| label: unaligned-labels
+#| fig-width: 9
+#| fig-height: 5
+base_tree <- ggtree(tree_pretty) +
+  scale_x_continuous(expand = expansion(mult = c(0.02, 0.55)))
+
+p_unaligned <- base_tree +
+  geom_marquee(
+    data = function(df) {
+      .tiplab_marquee_data_unaligned(df = df, offset = 0)
+    },
+    aes(x = x_lab, y = y, label = label),
+    hjust = 0,
+    size = 3.2,
+    family = "Arial",
+    inherit.aes = FALSE
+  ) +
+  geom_nodelab(
+    aes(label = label),
+    hjust = 1,
+    vjust = -0.4,
+    size = 2.6
+  ) +
+  coord_cartesian(clip = "off")
+
+p_unaligned
+```
+
+## align = TRUE: 補助線を付けて整列する
+
+```{r}
+#| label: aligned-labels
+#| fig-width: 9
+#| fig-height: 5
+p_aligned <- base_tree +
+  geom_segment(
+    data = function(df) {
+      .tiplab_segment_data(df = df, offset = 0)
+    },
+    aes(x = x, xend = xend, y = y, yend = yend),
+    linetype = "dotted",
+    linewidth = 0.35,
+    colour = "grey45",
+    inherit.aes = FALSE
+  ) +
+  geom_marquee(
+    data = function(df) {
+      .tiplab_marquee_data(df = df, offset = 0)
+    },
+    aes(x = x_lab, y = y, label = label),
+    hjust = 0,
+    size = 3.2,
+    family = "Arial",
+    inherit.aes = FALSE
+  ) +
+  geom_nodelab(
+    aes(label = label),
+    hjust = 1,
+    vjust = -0.4,
+    size = 2.6
+  ) +
+  coord_cartesian(clip = "off")
+
+p_aligned
+```
+
+## tipラベルの見切れを防ぐ（`expand = expansion(mult = ...)`）
+
+長い学名で tip ラベルが見切れる場合は、x 軸の `expand` を 明示して余白を確保します。\
+必要に応じて `coord_cartesian(clip = "off")` も併用します。
+
+```{r}
+#| label: avoid-tip-label-clipping
+#| fig-width: 9
+#| fig-height: 5
+base_tree_tight <- ggtree(tree_pretty)
+
+p_clipping_control <- base_tree_tight +
+  geom_segment(
+    data = function(df) {
+      .tiplab_segment_data(df = df, offset = 0)
+    },
+    aes(x = x, xend = xend, y = y, yend = yend),
+    linetype = "dotted",
+    linewidth = 0.35,
+    colour = "grey45",
+    inherit.aes = FALSE
+  ) +
+  geom_marquee(
+    data = function(df) {
+      .tiplab_marquee_data(df = df, offset = 0)
+    },
+    aes(x = x_lab, y = y, label = label),
+    hjust = 0,
+    size = 3.2,
+    family = "Arial",
+    inherit.aes = FALSE
+  ) +
+  scale_x_continuous(expand = expansion(mult = c(0.02, 0.75))) +
+  coord_cartesian(clip = "off")
+
+p_clipping_control
+```
+
+## `scale_x_reverse()`で左右反転する
+
+右側パネル用に系統樹を反転したい場合は、`scale_x_reverse()` を 最後に追加します。\
+反転後は tip ラベルが左側へ出るため、`hjust = 1` と `expand = expansion(mult = c(..., ...))` の下限側調整が有効です。
+
+```{r}
+#| label: reversed-tree
+#| fig-width: 9
+#| fig-height: 5
+p_reversed <- ggtree(tree_pretty) +
+  geom_segment(
+    data = function(df) {
+      .tiplab_segment_data(df = df, offset = 0)
+    },
+    aes(x = x, xend = xend, y = y, yend = yend),
+    linetype = "dotted",
+    linewidth = 0.35,
+    colour = "grey45",
+    inherit.aes = FALSE
+  ) +
+  geom_marquee(
+    data = function(df) {
+      .tiplab_marquee_data(df = df, offset = 0)
+    },
+    aes(x = x_lab, y = y, label = label),
+    hjust = 1,
+    size = 3.2,
+    family = "Arial",
+    inherit.aes = FALSE
+  ) +
+  geom_nodelab(
+    aes(label = label),
+    hjust = 0,
+    vjust = -0.4,
+    size = 2.6
+  ) +
+  coord_cartesian(clip = "off") +
+  scale_x_reverse(expand = expansion(mult = c(0.70, 0.02)))
+
+p_reversed
+```
+
+## 仕様解説
+
+### `expand = expansion(mult = c(0.70, 0.02))`
+
+-   `expansion(mult = ...)` の `mult` は、データ範囲に対する相対余白です。
+-   長さ 2 の場合、`c(a, b)` は軸の両端に別々の余白率を指定します。
+-   `c(0.70, 0.02)` は「片側を大きく、反対側を小さく」余白確保する設定です。
+-   `scale_x_reverse()` では表示方向が反転するため、この vignette では ラベル側（左側）に広い余白を取り、反対側を最小限にしています。
+
+### `format_node_support()` の仕様
+
+-   入力は node support の文字ベクトル `x`。
+-   2 値形式（例: `"SH/UFBoot"`）では、 `sh_alrt_cutoff` と `boot_cutoff` でそれぞれ判定します。
+-   閾値未満の値は `missing_mark` へ置換され、 両方が閾値未満なら空文字 `""` になります。
+-   1 値形式は `single_value = "ufboot"` または `"sh_alrt"` で解釈できます。
+-   `keep_na = TRUE` のときは `NA` を保持し、 `sig_digits` で表示桁数を制御します。
+
+簡単な Markdown 解説:
+
+-   文字列そのものを整形する関数で、強調記法は追加しません。
+-   `missing_mark` の置換結果をそのままラベルとして使えます。
+
+```{r}
+#| label: example-format-node-support
+support_example <- c("66.6/59", "90/94", "85/97", "55", "90", NA, "")
+
+tibble(
+  input = support_example,
+  output_default = format_node_support(support_example),
+  output_as_sh = format_node_support(
+    support_example,
+    single_value = "sh_alrt"
+  )
+)
+```
+
+### `style_tree_label()` の仕様
+
+-   入力は tree label の文字ベクトル `x`。
+-   学名に相当する部分は内部で `style_sciname()` を使って整形します。
+-   空文字と数値系ラベル（例: `"100"`, `"100/98"`）はそのまま返します。
+-   `mycobiont_of_...` 形式にも対応し、末尾トークンの扱いは `last_taxon_rank` で補助できます。
+-   `last_taxon_rank` は `"genus"` / `"species"` などを指定でき、 `NA_character_` または `""` で無効化されます。
+
+簡単な Markdown 解説:
+
+-   学名部分に `*...*` が付与され、Markdown italic として描画できます。
+-   数値系ラベルは未変換なので、support 表示と混在させやすいです。
+
+```{r}
+#| label: example-style-tree-label
+tree_label_example <- c(
+  "Coprinellus-aureogranulatus_GQ249274.1",
+  "mycobiont_of_Cremastra-aphylla_(ORM)_OTU1_Psathyrella",
+  "100/98"
+)
+
+tibble(
+  input = tree_label_example,
+  output_default = style_tree_label(tree_label_example),
+  output_genus = style_tree_label(
+    tree_label_example,
+    last_taxon_rank = "genus"
+  )
+)
+```
+
+### `style_sciname()` の仕様
+
+-   入力は学名文字列ベクトル `x`。
+-   属・種などの学名部分を Markdown italic（`*...*`）へ変換します。
+-   `cf.`, `aff.`, `nr.` などの同定補助語、 `subsp.`, `var.`, `f.` などの階級語を正規化します。
+-   `×` / `x` の交雑表記にも対応します。
+-   数値系ラベル（例: bootstrap 値）は未変換で返します。
+
+簡単な Markdown 解説:
+
+-   学名の主要部分だけに `*...*` を付与し、補助語は通常テキストのまま残します。
+-   `geom_marquee()` など Markdown 解釈する layer と相性が良いです。
+
+```{r}
+#| label: example-style-sciname
+sciname_example <- c(
+  "Cremastra aphylla",
+  "Cremastra cf. appendiculata",
+  "×Cremastra appendiculata var. variabilis f. alba",
+  "88"
+)
+
+tibble(
+  input = sciname_example,
+  output = style_sciname(sciname_example)
+)
+```
+
+## 実務メモ
+
+-   系統推定時に `(ORM)` のような括弧付き表記がプログラム側で `_ORM_` へ置換される場合があります。 `style_tree_label()` の前に `str_replace_all()` で `_(ORM)_` 形式へ戻しておくと整形が安定します。
+-   support 値は `format_node_support()` で閾値を固定しておくと、 図間比較時の解釈がぶれにくくなります。
+-   `offset` を小さく調整すると、狭い図幅でもラベル同士の衝突を減らせます。
+-   見切れ対策は `scale_x_*()` の `expand = expansion(mult = c(..., ...))` を 先に調整し、`plot.margin` には依存しない設定にしておくと再利用しやすくなります。
+-   反転パネルでは `scale_x_reverse(expand = ...)` と `hjust = 1` をセットで 調整すると、ラベルの位置合わせが安定します。

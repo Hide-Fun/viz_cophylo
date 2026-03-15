@@ -1,0 +1,342 @@
+[
+  {
+    "objectID": "ggbipartite-sciname-tree-ja.html",
+    "href": "ggbipartite-sciname-tree-ja.html",
+    "title": "学名付きの系統樹ラベルを整える",
+    "section": "",
+    "text": "事前準備\nこの vignette では、学名付きラベルを読みやすく整形しつつ、 ggtree で tip label を綺麗に配置する最小例を示します。\n学名部分はすべてダミーデータです。\nこの章で使う主な関数:\nlibrary(tidyverse)\nlibrary(ape)\nlibrary(ggtree)\nlibrary(marquee)\nlibrary(ggbipartite)",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>学名付きの系統樹ラベルを整える</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-sciname-tree-ja.html#事前準備",
+    "href": "ggbipartite-sciname-tree-ja.html#事前準備",
+    "title": "学名付きの系統樹ラベルを整える",
+    "section": "",
+    "text": "style_tree_label(): 学名ラベルを Markdown 形式で整形します。\nformat_node_support(): node support 値を閾値で整形します。\ngeom_marquee(): Markdown ラベルを安定して描画します。\n.tiplab_*(): tip label の x 座標と補助線を計算します。",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>学名付きの系統樹ラベルを整える</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-sciname-tree-ja.html#ダミー系統樹とラベルを用意する",
+    "href": "ggbipartite-sciname-tree-ja.html#ダミー系統樹とラベルを用意する",
+    "title": "学名付きの系統樹ラベルを整える",
+    "section": "ダミー系統樹とラベルを用意する",
+    "text": "ダミー系統樹とラベルを用意する\n\nset.seed(20260305)\n\ntree_raw &lt;- rtree(10)\ntree_raw$tip.label &lt;- c(\n  \"Cortinarius-violaceus_AB123456.1\",\n  \"Laccaria-bicolor_MN234567.1\",\n  \"Russula-cyanoxantha_LC345678.1\",\n  \"mycobiont_of_Fagus-crenata_ORM_OTU1_Psathyrella\",\n  \"mycobiont_of_Quercus-crispula_ORM_OTU2_Tomentella\",\n  \"mycobiont_of_Betula-ermanii_ORM_OTU3_Thelephoraceae\",\n  \"Amanita-muscaria_OP456789.1\",\n  \"Clavulina-cinerea_PP567890.1\",\n  \"Inocybe-geophylla_QQ678901.1\",\n  \"Hebeloma-crustuliniforme_RR789012.1\"\n)\n\nsupport_pool &lt;- c(\n  \"98/100\", \"95/99\", \"92/97\", \"88/96\", \"84/95\",\n  \"79/90\", \"70/86\", \"66/82\", \"61/80\"\n)\ntree_raw$node.label &lt;- support_pool[seq_len(tree_raw$Nnode)]\n\ntree_rooted &lt;- root(\n  phy = tree_raw,\n  outgroup = tree_raw$tip.label[1],\n  resolve.root = TRUE\n)",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>学名付きの系統樹ラベルを整える</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-sciname-tree-ja.html#学名とサポート値を整形する",
+    "href": "ggbipartite-sciname-tree-ja.html#学名とサポート値を整形する",
+    "title": "学名付きの系統樹ラベルを整える",
+    "section": "学名とサポート値を整形する",
+    "text": "学名とサポート値を整形する\n\ntree_pretty &lt;- tree_rooted\n\ntree_pretty$tip.label &lt;- tree_rooted$tip.label |&gt;\n  str_replace_all(\"_ORM_\", \"_(ORM)_\") |&gt;\n  str_remove(\"\\\\.1$\") |&gt;\n  style_tree_label(last_taxon_rank = \"genus\")\n\ntree_pretty$node.label &lt;- format_node_support(\n  x = tree_rooted$node.label,\n  sh_alrt_cutoff = 80,\n  boot_cutoff = 95\n)\n\nlabel_preview &lt;- tibble(\n  raw_label = tree_rooted$tip.label,\n  styled_label = tree_pretty$tip.label\n)\n\nlabel_preview\n\n# A tibble: 10 × 2\n   raw_label                                           styled_label             \n   &lt;chr&gt;                                               &lt;chr&gt;                    \n 1 Cortinarius-violaceus_AB123456.1                    *Cortinarius* *violaceus…\n 2 Laccaria-bicolor_MN234567.1                         *Laccaria* *bicolor* MN2…\n 3 Russula-cyanoxantha_LC345678.1                      *Russula* *cyanoxantha* …\n 4 mycobiont_of_Fagus-crenata_ORM_OTU1_Psathyrella     mycobiont of *Fagus* *cr…\n 5 mycobiont_of_Quercus-crispula_ORM_OTU2_Tomentella   mycobiont of *Quercus* *…\n 6 mycobiont_of_Betula-ermanii_ORM_OTU3_Thelephoraceae mycobiont of *Betula* *e…\n 7 Amanita-muscaria_OP456789.1                         *Amanita* *muscaria* OP4…\n 8 Clavulina-cinerea_PP567890.1                        *Clavulina* *cinerea* PP…\n 9 Inocybe-geophylla_QQ678901.1                        *Inocybe* *geophylla* QQ…\n10 Hebeloma-crustuliniforme_RR789012.1                 *Hebeloma* *crustulinifo…\n\n\n実務では、系統推定結果を phylo として読み込み、 必要なら root を設定したうえで tibble に変換し、 label 列を mutate() + case_when() で整形してから phylo に戻す流れが扱いやすいです。\nmycobiont・サポート値・その他の学名を 1 箇所で分岐できるため、 可視化前の前処理を集約できます。\n\ntree_pretty_from_file &lt;- read.tree(\"path/to/your_tree.treefile\") |&gt;\n  phytools::reroot(node.number = 31) |&gt; # Set root at a target clade.\n  as_tibble() |&gt;\n  mutate(\n    label = str_replace_all(\n      .data$label,\n      \"_ORM_\",\n      \"(ORM)\"\n    ),\n    label = str_remove(.data$label, \"\\\\.1$\"),\n    label = case_when(\n      str_detect(.data$label, \"mycobiont\") ~\n        style_tree_label(.data$label),\n      str_detect(\n        .data$label,\n        \"^\\\\d+(?:\\\\.\\\\d+)?/\\\\d+(?:\\\\.\\\\d+)?$\"\n      ) ~ .data$label,\n      .default = style_sciname(.data$label)\n    )\n  ) |&gt;\n  as.phylo()\n\nこの方法だと、ggtree() 側では整形済みラベルをそのまま使えるため、 プロット層で文字列処理を書く必要が減り、図コードの可読性が上がります。",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>学名付きの系統樹ラベルを整える</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-sciname-tree-ja.html#align-false-tipごとにラベルを寄せる",
+    "href": "ggbipartite-sciname-tree-ja.html#align-false-tipごとにラベルを寄せる",
+    "title": "学名付きの系統樹ラベルを整える",
+    "section": "align = FALSE: tipごとにラベルを寄せる",
+    "text": "align = FALSE: tipごとにラベルを寄せる\n\nbase_tree &lt;- ggtree(tree_pretty) +\n  scale_x_continuous(expand = expansion(mult = c(0.02, 0.55)))\n\np_unaligned &lt;- base_tree +\n  geom_marquee(\n    data = function(df) {\n      .tiplab_marquee_data_unaligned(df = df, offset = 0)\n    },\n    aes(x = x_lab, y = y, label = label),\n    hjust = 0,\n    size = 3.2,\n    family = \"Arial\",\n    inherit.aes = FALSE\n  ) +\n  geom_nodelab(\n    aes(label = label),\n    hjust = 1,\n    vjust = -0.4,\n    size = 2.6\n  ) +\n  coord_cartesian(clip = \"off\")\n\np_unaligned",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>学名付きの系統樹ラベルを整える</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-sciname-tree-ja.html#align-true-補助線を付けて整列する",
+    "href": "ggbipartite-sciname-tree-ja.html#align-true-補助線を付けて整列する",
+    "title": "学名付きの系統樹ラベルを整える",
+    "section": "align = TRUE: 補助線を付けて整列する",
+    "text": "align = TRUE: 補助線を付けて整列する\n\np_aligned &lt;- base_tree +\n  geom_segment(\n    data = function(df) {\n      .tiplab_segment_data(df = df, offset = 0)\n    },\n    aes(x = x, xend = xend, y = y, yend = yend),\n    linetype = \"dotted\",\n    linewidth = 0.35,\n    colour = \"grey45\",\n    inherit.aes = FALSE\n  ) +\n  geom_marquee(\n    data = function(df) {\n      .tiplab_marquee_data(df = df, offset = 0)\n    },\n    aes(x = x_lab, y = y, label = label),\n    hjust = 0,\n    size = 3.2,\n    family = \"Arial\",\n    inherit.aes = FALSE\n  ) +\n  geom_nodelab(\n    aes(label = label),\n    hjust = 1,\n    vjust = -0.4,\n    size = 2.6\n  ) +\n  coord_cartesian(clip = \"off\")\n\np_aligned",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>学名付きの系統樹ラベルを整える</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-sciname-tree-ja.html#tipラベルの見切れを防ぐexpand-expansionmult-...",
+    "href": "ggbipartite-sciname-tree-ja.html#tipラベルの見切れを防ぐexpand-expansionmult-...",
+    "title": "学名付きの系統樹ラベルを整える",
+    "section": "tipラベルの見切れを防ぐ（expand = expansion(mult = ...)）",
+    "text": "tipラベルの見切れを防ぐ（expand = expansion(mult = ...)）\n長い学名で tip ラベルが見切れる場合は、x 軸の expand を 明示して余白を確保します。\n必要に応じて coord_cartesian(clip = \"off\") も併用します。\n\nbase_tree_tight &lt;- ggtree(tree_pretty)\n\np_clipping_control &lt;- base_tree_tight +\n  geom_segment(\n    data = function(df) {\n      .tiplab_segment_data(df = df, offset = 0)\n    },\n    aes(x = x, xend = xend, y = y, yend = yend),\n    linetype = \"dotted\",\n    linewidth = 0.35,\n    colour = \"grey45\",\n    inherit.aes = FALSE\n  ) +\n  geom_marquee(\n    data = function(df) {\n      .tiplab_marquee_data(df = df, offset = 0)\n    },\n    aes(x = x_lab, y = y, label = label),\n    hjust = 0,\n    size = 3.2,\n    family = \"Arial\",\n    inherit.aes = FALSE\n  ) +\n  scale_x_continuous(expand = expansion(mult = c(0.02, 0.75))) +\n  coord_cartesian(clip = \"off\")\n\np_clipping_control",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>学名付きの系統樹ラベルを整える</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-sciname-tree-ja.html#scale_x_reverseで左右反転する",
+    "href": "ggbipartite-sciname-tree-ja.html#scale_x_reverseで左右反転する",
+    "title": "学名付きの系統樹ラベルを整える",
+    "section": "scale_x_reverse()で左右反転する",
+    "text": "scale_x_reverse()で左右反転する\n右側パネル用に系統樹を反転したい場合は、scale_x_reverse() を 最後に追加します。\n反転後は tip ラベルが左側へ出るため、hjust = 1 と expand = expansion(mult = c(..., ...)) の下限側調整が有効です。\n\np_reversed &lt;- ggtree(tree_pretty) +\n  geom_segment(\n    data = function(df) {\n      .tiplab_segment_data(df = df, offset = 0)\n    },\n    aes(x = x, xend = xend, y = y, yend = yend),\n    linetype = \"dotted\",\n    linewidth = 0.35,\n    colour = \"grey45\",\n    inherit.aes = FALSE\n  ) +\n  geom_marquee(\n    data = function(df) {\n      .tiplab_marquee_data(df = df, offset = 0)\n    },\n    aes(x = x_lab, y = y, label = label),\n    hjust = 1,\n    size = 3.2,\n    family = \"Arial\",\n    inherit.aes = FALSE\n  ) +\n  geom_nodelab(\n    aes(label = label),\n    hjust = 0,\n    vjust = -0.4,\n    size = 2.6\n  ) +\n  coord_cartesian(clip = \"off\") +\n  scale_x_reverse(expand = expansion(mult = c(0.70, 0.02)))\n\np_reversed",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>学名付きの系統樹ラベルを整える</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-sciname-tree-ja.html#仕様解説",
+    "href": "ggbipartite-sciname-tree-ja.html#仕様解説",
+    "title": "学名付きの系統樹ラベルを整える",
+    "section": "仕様解説",
+    "text": "仕様解説\n\nexpand = expansion(mult = c(0.70, 0.02))\n\nexpansion(mult = ...) の mult は、データ範囲に対する相対余白です。\n長さ 2 の場合、c(a, b) は軸の両端に別々の余白率を指定します。\nc(0.70, 0.02) は「片側を大きく、反対側を小さく」余白確保する設定です。\nscale_x_reverse() では表示方向が反転するため、この vignette では ラベル側（左側）に広い余白を取り、反対側を最小限にしています。\n\n\n\nformat_node_support() の仕様\n\n入力は node support の文字ベクトル x。\n2 値形式（例: \"SH/UFBoot\"）では、 sh_alrt_cutoff と boot_cutoff でそれぞれ判定します。\n閾値未満の値は missing_mark へ置換され、 両方が閾値未満なら空文字 \"\" になります。\n1 値形式は single_value = \"ufboot\" または \"sh_alrt\" で解釈できます。\nkeep_na = TRUE のときは NA を保持し、 sig_digits で表示桁数を制御します。\n\n簡単な Markdown 解説:\n\n文字列そのものを整形する関数で、強調記法は追加しません。\nmissing_mark の置換結果をそのままラベルとして使えます。\n\n\nsupport_example &lt;- c(\"66.6/59\", \"90/94\", \"85/97\", \"55\", \"90\", NA, \"\")\n\ntibble(\n  input = support_example,\n  output_default = format_node_support(support_example),\n  output_as_sh = format_node_support(\n    support_example,\n    single_value = \"sh_alrt\"\n  )\n)\n\n# A tibble: 7 × 3\n  input     output_default output_as_sh\n  &lt;chr&gt;     &lt;chr&gt;          &lt;chr&gt;       \n1 \"66.6/59\" \"\"             \"\"          \n2 \"90/94\"   \"90/—\"         \"90/—\"      \n3 \"85/97\"   \"85/97\"        \"85/97\"     \n4 \"55\"      \"\"             \"\"          \n5 \"90\"      \"\"             \"90\"        \n6  &lt;NA&gt;      &lt;NA&gt;           &lt;NA&gt;       \n7 \"\"        \"\"             \"\"          \n\n\n\n\nstyle_tree_label() の仕様\n\n入力は tree label の文字ベクトル x。\n学名に相当する部分は内部で style_sciname() を使って整形します。\n空文字と数値系ラベル（例: \"100\", \"100/98\"）はそのまま返します。\nmycobiont_of_... 形式にも対応し、末尾トークンの扱いは last_taxon_rank で補助できます。\nlast_taxon_rank は \"genus\" / \"species\" などを指定でき、 NA_character_ または \"\" で無効化されます。\n\n簡単な Markdown 解説:\n\n学名部分に *...* が付与され、Markdown italic として描画できます。\n数値系ラベルは未変換なので、support 表示と混在させやすいです。\n\n\ntree_label_example &lt;- c(\n  \"Coprinellus-aureogranulatus_GQ249274.1\",\n  \"mycobiont_of_Cremastra-aphylla_(ORM)_OTU1_Psathyrella\",\n  \"100/98\"\n)\n\ntibble(\n  input = tree_label_example,\n  output_default = style_tree_label(tree_label_example),\n  output_genus = style_tree_label(\n    tree_label_example,\n    last_taxon_rank = \"genus\"\n  )\n)\n\n# A tibble: 3 × 3\n  input                                              output_default output_genus\n  &lt;chr&gt;                                              &lt;chr&gt;          &lt;chr&gt;       \n1 Coprinellus-aureogranulatus_GQ249274.1             *Coprinellus*… *Coprinellu…\n2 mycobiont_of_Cremastra-aphylla_(ORM)_OTU1_Psathyr… mycobiont of … mycobiont o…\n3 100/98                                             100/98         100/98      \n\n\n\n\nstyle_sciname() の仕様\n\n入力は学名文字列ベクトル x。\n属・種などの学名部分を Markdown italic（*...*）へ変換します。\ncf., aff., nr. などの同定補助語、 subsp., var., f. などの階級語を正規化します。\n× / x の交雑表記にも対応します。\n数値系ラベル（例: bootstrap 値）は未変換で返します。\n\n簡単な Markdown 解説:\n\n学名の主要部分だけに *...* を付与し、補助語は通常テキストのまま残します。\ngeom_marquee() など Markdown 解釈する layer と相性が良いです。\n\n\nsciname_example &lt;- c(\n  \"Cremastra aphylla\",\n  \"Cremastra cf. appendiculata\",\n  \"×Cremastra appendiculata var. variabilis f. alba\",\n  \"88\"\n)\n\ntibble(\n  input = sciname_example,\n  output = style_sciname(sciname_example)\n)\n\n# A tibble: 4 × 2\n  input                                            output                       \n  &lt;chr&gt;                                            &lt;chr&gt;                        \n1 Cremastra aphylla                                *Cremastra* *aphylla*        \n2 Cremastra cf. appendiculata                      *Cremastra* cf. *appendicula…\n3 ×Cremastra appendiculata var. variabilis f. alba ×*Cremastra* *appendiculata*…\n4 88                                               88",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>学名付きの系統樹ラベルを整える</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-sciname-tree-ja.html#実務メモ",
+    "href": "ggbipartite-sciname-tree-ja.html#実務メモ",
+    "title": "学名付きの系統樹ラベルを整える",
+    "section": "実務メモ",
+    "text": "実務メモ\n\n系統推定時に (ORM) のような括弧付き表記がプログラム側で _ORM_ へ置換される場合があります。 style_tree_label() の前に str_replace_all() で _(ORM)_ 形式へ戻しておくと整形が安定します。\nsupport 値は format_node_support() で閾値を固定しておくと、 図間比較時の解釈がぶれにくくなります。\noffset を小さく調整すると、狭い図幅でもラベル同士の衝突を減らせます。\n見切れ対策は scale_x_*() の expand = expansion(mult = c(..., ...)) を 先に調整し、plot.margin には依存しない設定にしておくと再利用しやすくなります。\n反転パネルでは scale_x_reverse(expand = ...) と hjust = 1 をセットで 調整すると、ラベルの位置合わせが安定します。",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>学名付きの系統樹ラベルを整える</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-visualization-ja.html",
+    "href": "ggbipartite-visualization-ja.html",
+    "title": "ggbipartiteで始める二部ネットワーク可視化",
+    "section": "",
+    "text": "事前準備\nこの vignette は、ggbipartite を使った二部ネットワーク可視化を 初心者向けに段階的に解説します。\n最終的に、次の 4 パターンを自分のデータで再現できる状態を目指します。\nlibrary(ggplot2)\nlibrary(dplyr)\nlibrary(tidyr)\nlibrary(tibble)\nlibrary(ape)\nlibrary(ggtree)\nlibrary(ggbipartite)\nlibrary(patchwork)",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>ggbipartiteで始める二部ネットワーク可視化</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-visualization-ja.html#まず系統樹を可視化して全体像を掴む",
+    "href": "ggbipartite-visualization-ja.html#まず系統樹を可視化して全体像を掴む",
+    "title": "ggbipartiteで始める二部ネットワーク可視化",
+    "section": "まず系統樹を可視化して全体像を掴む",
+    "text": "まず系統樹を可視化して全体像を掴む\nこの章で使う主な関数:\n\nrtree(): 例示用のランダム系統樹を生成します。\nggtree(): 系統樹を ggplot オブジェクトとして描画します。\ngeom_tiplab(): tip ラベルを表示します。\npatchwork::plot_layout(): 2つの tree を横並びで表示します。\n\n最初に host_phylo と symbiont_phylo を単体で描くと、 「左右どちらがどの生物群か」をイメージしやすくなります。\n\nset.seed(123)\n\nhost_phylo &lt;- rtree(8)\nhost_phylo$tip.label &lt;- LETTERS[1:8]\n\nsymbiont_phylo &lt;- rtree(5)\nsymbiont_phylo$tip.label &lt;- sprintf(\"otu_%d\", 1:5)\n\np_host_tree &lt;- ggtree(host_phylo) +\n  geom_tiplab(size = 3) +\n  labs(title = \"Host phylogeny\")\n\np_symbiont_tree &lt;- ggtree(symbiont_phylo) +\n  geom_tiplab(size = 3) +\n  labs(title = \"Symbiont phylogeny\")\n\nif (requireNamespace(\"patchwork\", quietly = TRUE)) {\n  p_host_tree +\n    p_symbiont_tree +\n    patchwork::plot_layout(nrow = 1)\n} else {\n  p_host_tree\n  p_symbiont_tree\n}",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>ggbipartiteで始める二部ネットワーク可視化</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-visualization-ja.html#相互作用行列を作り系統樹の順序に合わせる",
+    "href": "ggbipartite-visualization-ja.html#相互作用行列を作り系統樹の順序に合わせる",
+    "title": "ggbipartiteで始める二部ネットワーク可視化",
+    "section": "相互作用行列を作り、系統樹の順序に合わせる",
+    "text": "相互作用行列を作り、系統樹の順序に合わせる\nこの章で使う主な関数:\n\nget_tip_order(): tree 上の y 順に tip ラベル順を取得します。\nbase::factor(levels = ...): host / symbiont の表示順を固定します。\narrange() と relocate(): 行列化前の表を順序どおりに並べます。\ncolumn_to_rownames(): host 列を行名へ変換して行列化します。\n\nggbipartite では、行列の行順・列順がレイアウトに直接影響します。\nそのため、系統樹と対応させる場合は以下の 2 点が重要です。\n\nfactor(levels = ...) で表示順を明示する\n行列をその順序でソートしてから可視化に使う\n\n\nhost_order &lt;- get_tip_order(host_phylo) |&gt; rev()\nsymbiont_order &lt;- get_tip_order(symbiont_phylo) |&gt; rev()\n\ninteraction_tbl &lt;- tibble(\n  host = LETTERS[1:8],\n  otu_1 = c(40, 0, 20, 0, 5, 0, 8, 1),\n  otu_2 = c(0, 9, 1, 4, 0, 2, 0, 0),\n  otu_3 = c(10, 0, 0, 3, 4, 0, 1, 7),\n  otu_4 = c(1, 0, 12, 0, 0, 6, 0, 0),\n  otu_5 = c(0, 2, 0, 1, 8, 0, 0, 3)\n)\n\ninteraction_matrix &lt;- interaction_tbl |&gt;\n  arrange(factor(host, levels = host_order)) |&gt;\n  relocate(host, all_of(symbiont_order)) |&gt;\n  column_to_rownames(var = \"host\") |&gt;\n  as.matrix()\n\nmetadata_row &lt;- tibble(\n  host = rownames(interaction_matrix),\n  family = c(\n    \"Fagaceae\", \"Fagaceae\", \"Rosaceae\", \"Rosaceae\",\n    \"Fabaceae\", \"Fabaceae\", \"Betulaceae\", \"Betulaceae\"\n  )\n)\n\nmetadata_column &lt;- tibble(\n  symbiont = colnames(interaction_matrix),\n  guild = c(\"AMF\", \"AMF\", \"ECM\", \"ECM\", \"Unknown\")\n)\n\ninteraction_matrix\n\n  otu_2 otu_1 otu_3 otu_5 otu_4\nE     0     5     4     8     0\nD     4     0     3     1     0\nF     2     0     0     0     6\nG     0     8     1     0     0\nB     9     0     0     2     0\nA     0    40    10     0     1\nC     1    20     0     0    12\nH     0     1     7     3     0",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>ggbipartiteで始める二部ネットワーク可視化</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-visualization-ja.html#long-形式へ変換し-row-column-count-を理解する",
+    "href": "ggbipartite-visualization-ja.html#long-形式へ変換し-row-column-count-を理解する",
+    "title": "ggbipartiteで始める二部ネットワーク可視化",
+    "section": "long 形式へ変換し row, column, count を理解する",
+    "text": "long 形式へ変換し row, column, count を理解する\nこの章で使う主な関数:\n\nto_longer(): 行列を long 形式へ変換します（0 は除外）。\nrename() と mutate(): count 列名と因子順を整えます。\nggbipartite の主要 geoms は row, column, count を必須入力として使います。\n\nggplot() に渡すときは、最低限 row, column, count を使います。\n\nrow: 左側ノードID（この vignette では host）\ncolumn: 右側ノードID（この vignette では symbiont/otu）\ncount: 相互作用の強さ（カウント、重み）\n\n\ninteraction_df &lt;- to_longer(interaction_matrix, .rowname = \"row\") |&gt;\n  rename(count = interaction) |&gt;\n  mutate(\n    row = factor(row, levels = rownames(interaction_matrix)),\n    column = factor(column, levels = colnames(interaction_matrix))\n  )\n\nglimpse(interaction_df)\n\nRows: 21\nColumns: 3\n$ row    &lt;fct&gt; E, E, E, D, D, D, F, F, G, G, B, B, A, A, A, C, C, C, H, H, H\n$ column &lt;fct&gt; otu_1, otu_3, otu_5, otu_2, otu_3, otu_5, otu_2, otu_4, otu_1, …\n$ count  &lt;dbl&gt; 5, 4, 8, 4, 3, 1, 2, 6, 8, 1, 9, 2, 40, 10, 1, 1, 20, 12, 1, 7,…\n\n\n原理的には、行列と系統樹の左右対応が保たれていれば row / column を逆に定義しても描画は可能です。\nただし実務では混乱を避けるため、最初に 「row をどちら側とみなすか」を固定することを推奨します。",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>ggbipartiteで始める二部ネットワーク可視化</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-visualization-ja.html#abundance-の基本可視化",
+    "href": "ggbipartite-visualization-ja.html#abundance-の基本可視化",
+    "title": "ggbipartiteで始める二部ネットワーク可視化",
+    "section": "abundance の基本可視化",
+    "text": "abundance の基本可視化\nこの章で使う主な関数:\n\ngeom_bipnet_box(): row / column 側のボックスを描きます。\ngeom_bipnet_interaction(): 相互作用ポリゴンを描きます。\nstat_bipnet(): geom_bipnet_*() から内部的に呼ばれ、座標計算を行います。\n\n\ngap_value &lt;- sum(interaction_matrix) / 12\n\np_abundance &lt;- ggplot(\n  interaction_df,\n  aes(row = row, column = column, count = count)\n) +\n  geom_bipnet_box(\n    type = \"row\",\n    gap = gap_value,\n    fill = \"grey85\",\n    colour = \"grey30\",\n    linewidth = 0.2\n  ) +\n  geom_bipnet_box(\n    type = \"column\",\n    gap = gap_value,\n    fill = \"#2C3E50\",\n    colour = \"grey10\",\n    linewidth = 0.2\n  ) +\n  geom_bipnet_interaction(\n    gap = gap_value,\n    alpha = 0.55,\n    linewidth = 0.15,\n    show.legend = FALSE\n  ) +\n  theme_void()\n\np_abundance\n\n\n\n\n\n\n\n\ngap を未指定にすると stat_bipnet() が自動で値を選びます （sum(count) / 10、非正の場合は 1）。\n再現性の観点では、gap は明示指定するのが安全です。\n補足: geom_bipnet_interaction() では type = \"interaction\" が既定なので、 通常は省略できます（上のコードも省略形です）。",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>ggbipartiteで始める二部ネットワーク可視化</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-visualization-ja.html#メタデータで色分けする",
+    "href": "ggbipartite-visualization-ja.html#メタデータで色分けする",
+    "title": "ggbipartiteで始める二部ネットワーク可視化",
+    "section": "メタデータで色分けする",
+    "text": "メタデータで色分けする\nこの章で使う主な関数:\n\ngeom_bipnet_box(): row / column のメタデータ色分けに使います。\ngeom_bipnet_interaction(): 連結部もメタデータで色分けできます。\ngeom_bipnet_point(): binary 表示時のノード色分けに使えます。\nafter_stat(): stat_bipnet() が後段で付与する列を参照します。\n\nrow 側だけでなく column 側でも同様に色分けできます。\nさらに同じ考え方で geom_bipnet_point() と geom_bipnet_interaction() でも色分け可能です。\nafter_stat() を使う理由は、metadata_row / metadata_column の列が stat_bipnet() の計算後にデータへ結合されるためです。 つまり元データ interaction_df には存在しない列を 審美属性に使うには after_stat() が必要になります。\n\np_metadata &lt;- ggplot(\n  interaction_df,\n  aes(row = row, column = column, count = count)\n) +\n  geom_bipnet_box(\n    aes(fill = after_stat(family)),\n    type = \"row\",\n    row_nm = \"host\",\n    metadata_row = metadata_row,\n    gap = gap_value,\n    linewidth = 0.2\n  ) +\n  geom_bipnet_box(\n    aes(fill = after_stat(guild)),\n    type = \"column\",\n    column_nm = \"symbiont\",\n    metadata_column = metadata_column,\n    gap = gap_value,\n    linewidth = 0.2\n  ) +\n  geom_bipnet_interaction(\n    aes(fill = after_stat(guild)),\n    column_nm = \"symbiont\",\n    metadata_column = metadata_column,\n    gap = gap_value,\n    alpha = 0.35,\n    linewidth = 0.1,\n    colour = NA,\n    show.legend = FALSE\n  ) +\n  theme_void() +\n  labs(fill = \"Row/Column metadata\")\n\np_metadata\n\n\n\n\n\n\n\n\ngeom_bipnet_point() でも同じ発想で色付けできます。\n\nbinary_matrix &lt;- (interaction_matrix &gt; 0) * 1L\n\nbinary_df &lt;- to_longer(binary_matrix, .rowname = \"row\") |&gt;\n  rename(count = interaction) |&gt;\n  mutate(\n    row = factor(row, levels = rownames(binary_matrix)),\n    column = factor(column, levels = colnames(binary_matrix))\n  )\n\nggplot(binary_df, aes(row = row, column = column, count = count)) +\n  geom_bipnet_point(\n    aes(fill = after_stat(family)),\n    type = \"row\",\n    row_nm = \"host\",\n    metadata_row = metadata_row\n  ) +\n  geom_bipnet_point(\n    aes(fill = after_stat(guild)),\n    type = \"column\",\n    column_nm = \"symbiont\",\n    metadata_column = metadata_column\n  )",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>ggbipartiteで始める二部ネットワーク可視化</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-visualization-ja.html#レイアウトパラメータを調整する",
+    "href": "ggbipartite-visualization-ja.html#レイアウトパラメータを調整する",
+    "title": "ggbipartiteで始める二部ネットワーク可視化",
+    "section": "レイアウトパラメータを調整する",
+    "text": "レイアウトパラメータを調整する\nこの章で使う主な関数:\n\ngeom_bipnet_box(): gap, box_ratio, ratio, adjust_box_height を渡せます。\ngeom_bipnet_interaction(): 同じレイアウト引数を共有し、各レイヤーの整合を保ちます。\nstat_bipnet(): 指定パラメータに基づいて座標を再計算します。\n\nbox_ratio, ratio, adjust_box_height は次を調整します。\n\nbox_ratio: sum(count) / box_ratio でボックス幅を決める。値を大きくするとボックスは細くなる。\nratio: 全体の横方向スケールに影響する。値を小さくすると左右の間隔は広がる傾向がある。\nadjust_box_height: TRUE で row 側と column 側の総高さを揃えるよう gap を再調整する。\n\n\np_abundance_tuned &lt;- ggplot(\n  interaction_df,\n  aes(row = row, column = column, count = count)\n) +\n  geom_bipnet_box(\n    type = \"row\",\n    gap = sum(interaction_matrix) / 10,\n    box_ratio = 6,\n    ratio = 0.75,\n    adjust_box_height = TRUE,\n    fill = \"grey85\",\n    linewidth = 0.2\n  ) +\n  geom_bipnet_box(\n    type = \"column\",\n    gap = sum(interaction_matrix) / 10,\n    box_ratio = 6,\n    ratio = 0.75,\n    adjust_box_height = TRUE,\n    fill = \"#2C3E50\",\n    linewidth = 0.2\n  ) +\n  geom_bipnet_interaction(\n    gap = sum(interaction_matrix) / 10,\n    box_ratio = 6,\n    ratio = 0.75,\n    adjust_box_height = TRUE,\n    alpha = 0.5,\n    linewidth = 0.15,\n    show.legend = FALSE\n  ) +\n  coord_equal() +\n  theme_void()\n\np_abundance_tuned",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>ggbipartiteで始める二部ネットワーク可視化</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-visualization-ja.html#binary有無表示に切り替える",
+    "href": "ggbipartite-visualization-ja.html#binary有無表示に切り替える",
+    "title": "ggbipartiteで始める二部ネットワーク可視化",
+    "section": "binary（有無）表示に切り替える",
+    "text": "binary（有無）表示に切り替える\nこの章で使う主な関数:\n\nto_longer(): binary 行列を long 形式へ変換します。\ngeom_bipnet_interaction(interaction_type = \"binary\"): 相互作用を線分として描きます。\ngeom_bipnet_point(): row / column ノードを点として描きます。\n\n接続の「強さ」ではなく「存在/非存在」を見たい場合は interaction_type = \"binary\" を使います。\n\nbinary_matrix &lt;- (interaction_matrix &gt; 0) * 1L\n\nbinary_df &lt;- to_longer(binary_matrix, .rowname = \"row\") |&gt;\n  rename(count = interaction) |&gt;\n  mutate(\n    row = factor(row, levels = rownames(binary_matrix)),\n    column = factor(column, levels = colnames(binary_matrix))\n  )\n\nbinary_gap &lt;- sum(binary_matrix) / 10\n\np_binary &lt;- ggplot(\n  binary_df,\n  aes(row = row, column = column, count = count)\n) +\n  geom_bipnet_interaction(\n    interaction_type = \"binary\",\n    gap = binary_gap,\n    linewidth = 0.45,\n    alpha = 0.7,\n    show.legend = FALSE\n  ) +\n  geom_bipnet_point(\n    type = \"row\",\n    gap = binary_gap,\n    fill = \"steelblue\",\n    size = 2.4\n  ) +\n  geom_bipnet_point(\n    type = \"column\",\n    gap = binary_gap,\n    fill = \"navy\",\n    size = 2.4\n  ) +\n  coord_equal() +\n  theme_void()\n\np_binary",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>ggbipartiteで始める二部ネットワーク可視化</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-visualization-ja.html#construct_bn_coordination-でラベル注釈する",
+    "href": "ggbipartite-visualization-ja.html#construct_bn_coordination-でラベル注釈する",
+    "title": "ggbipartiteで始める二部ネットワーク可視化",
+    "section": "construct_bn_coordination() でラベル注釈する",
+    "text": "construct_bn_coordination() でラベル注釈する\nこの章で使う主な関数:\n\nconstruct_bn_coordination(): row_box / column_box / interaction 座標を明示的に作成します。\ncompute_box_label_coords(): ボックス外側ラベルの代表座標を算出します。\nannotate(): 算出座標を使ってテキスト注釈を描きます。\n\nconstruct_bn_coordination() は通常、 geom_bipnet_*() が内部で呼び出している座標計算関数です。\nふだんは直接呼ぶ必要はありませんが、 ラベル座標や外部図形（リンク線など）を自作するときには有用です。\n\nbn_coords &lt;- construct_bn_coordination(\n  .mat = interaction_matrix,\n  .row = \"host\",\n  .column = \"symbiont\",\n  .metadata_row = metadata_row,\n  .metadata_column = metadata_column,\n  .gap = gap_value\n)\n\nlabel_row &lt;- compute_box_label_coords(\n  .box = bn_coords$row_box,\n  .by = \"row\",\n  .side = \"row\"\n)\n\nlabel_column &lt;- compute_box_label_coords(\n  .box = bn_coords$column_box,\n  .by = \"column\",\n  .side = \"column\"\n)\n\nx_span &lt;- diff(range(c(label_row$x, label_column$x)))\nlabel_offset &lt;- x_span * 0.03\n\nggplot(\n  interaction_df,\n  aes(row = row, column = column, count = count)\n) +\n  geom_bipnet_box(type = \"row\", gap = gap_value, fill = \"grey85\", linewidth = 0.2) +\n  geom_bipnet_box(type = \"column\", gap = gap_value, fill = \"#2C3E50\", linewidth = 0.2) +\n  geom_bipnet_interaction(\n    gap = gap_value,\n    alpha = 0.5,\n    linewidth = 0.15,\n    show.legend = FALSE\n  ) +\n  annotate(\n    geom = \"text\",\n    x = label_row$x - label_offset,\n    y = label_row$y,\n    label = label_row$row,\n    hjust = 1,\n    size = 3\n  ) +\n  annotate(\n    geom = \"text\",\n    x = label_column$x + label_offset,\n    y = label_column$y,\n    label = label_column$column,\n    hjust = 0,\n    size = 3\n  ) +\n  coord_equal(clip = \"off\") +\n  theme_void()",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>ggbipartiteで始める二部ネットワーク可視化</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-visualization-ja.html#系統樹とネットワークを対応づける",
+    "href": "ggbipartite-visualization-ja.html#系統樹とネットワークを対応づける",
+    "title": "ggbipartiteで始める二部ネットワーク可視化",
+    "section": "系統樹とネットワークを対応づける",
+    "text": "系統樹とネットワークを対応づける\nこの章で使う主な関数:\n\nadjust_tree(): tree の y スケールをボックスに合わせます。\ncreate_link(): ボックス中心と tip を結ぶリンク座標を作ります。\nget_yrange(): 複数パネルの y 範囲を共通化します。\ngeom_tiplab(): tip ラベル（通常版と align = TRUE 版）を描きます。\n\nここでは次の 3 関数を連携させます。\n\nadjust_tree(): 系統樹の y スケールをボックスに合わせる\ncreate_link(): ボックス中心と tip を結ぶリンク座標を作る\nget_yrange(): 複数パネルの y 範囲を揃える\n\n\nt_row &lt;- adjust_tree(\n  .phylo = host_phylo,\n  .box = bn_coords$row_box,\n  .tree_position = \"left\",\n  .adjust = 1\n) +\n  geom_tiplab(size = 3)\n\nt_column &lt;- adjust_tree(\n  .phylo = symbiont_phylo,\n  .box = bn_coords$column_box,\n  .tree_position = \"right\",\n  .adjust = 1\n) +\n  geom_tiplab(hjust = 1, size = 3)\n\nlink_row &lt;- create_link(\n  box = bn_coords$row_box,\n  ggtree = t_row,\n  side = \"row\",\n  x = 1,\n  xend = 0\n)\n\nlink_column &lt;- create_link(\n  box = bn_coords$column_box,\n  ggtree = t_column,\n  side = \"column\",\n  x = 0,\n  xend = 1\n)\n\np_link_row &lt;- ggplot(link_row) +\n  geom_segment(\n    aes(x = x, y = y1, xend = xend, yend = y2, group = row),\n    linetype = \"dotted\",\n    linewidth = 0.4\n  ) +\n  theme_void()\n\np_link_column &lt;- ggplot(link_column) +\n  geom_segment(\n    aes(x = x, y = y1, xend = xend, yend = y2, group = column),\n    linetype = \"dotted\",\n    linewidth = 0.4\n  ) +\n  theme_void()\n\nylim_common &lt;- range(\n  c(get_yrange(t_row), get_yrange(t_column), get_yrange(p_abundance)),\n  na.rm = TRUE\n)\n\nscale_y_common &lt;- scale_y_continuous(\n  limits = ylim_common,\n  expand = expansion(mult = 0)\n)\n\nt_row &lt;- t_row + scale_y_common\nt_column &lt;- t_column + scale_y_common\np_link_row &lt;- p_link_row + scale_y_common\np_link_column &lt;- p_link_column + scale_y_common\np_abundance_aligned &lt;- p_abundance + scale_y_common\n\n\nt_row +\n  p_link_row +\n  p_abundance_aligned +\n  p_link_column +\n  t_column +\n  plot_layout(nrow = 1, widths = c(1, 0.25, 1, 0.25, 1))\n\n\n\n\n\n\n\n\n上記のバリエーションとして、tip ラベルを align = TRUE で描く版も 用意できます。tip ラベルの x 位置が揃うため、ラベル列の視認性が上がります。\n\nt_row_align &lt;- adjust_tree(\n  .phylo = host_phylo,\n  .box = bn_coords$row_box,\n  .tree_position = \"left\",\n  .adjust = 1\n) +\n  geom_tiplab(\n    align = TRUE,\n    linetype = \"dotted\",\n    size = 3\n  )\n\nt_column_align &lt;- adjust_tree(\n  .phylo = symbiont_phylo,\n  .box = bn_coords$column_box,\n  .tree_position = \"right\",\n  .adjust = 1\n) +\n  geom_tiplab(\n    align = TRUE,\n    linetype = \"dotted\",\n    hjust = 1,\n    size = 3\n  )\n\nlink_row_align &lt;- create_link(\n  box = bn_coords$row_box,\n  ggtree = t_row_align,\n  side = \"row\",\n  x = 1,\n  xend = 0\n)\n\nlink_column_align &lt;- create_link(\n  box = bn_coords$column_box,\n  ggtree = t_column_align,\n  side = \"column\",\n  x = 0,\n  xend = 1\n)\n\np_link_row_align &lt;- ggplot(link_row_align) +\n  geom_segment(\n    aes(x = x, y = y1, xend = xend, yend = y2, group = row),\n    linetype = \"dotted\",\n    linewidth = 0.4\n  ) +\n  theme_void()\n\np_link_column_align &lt;- ggplot(link_column_align) +\n  geom_segment(\n    aes(x = x, y = y1, xend = xend, yend = y2, group = column),\n    linetype = \"dotted\",\n    linewidth = 0.4\n  ) +\n  theme_void()\n\nylim_common_align &lt;- range(\n  c(\n    get_yrange(t_row_align),\n    get_yrange(t_column_align),\n    get_yrange(p_abundance)\n  ),\n  na.rm = TRUE\n)\n\nscale_y_common_align &lt;- scale_y_continuous(\n  limits = ylim_common_align,\n  expand = expansion(mult = 0)\n)\n\nt_row_align &lt;- t_row_align + scale_y_common_align\nt_column_align &lt;- t_column_align + scale_y_common_align\np_link_row_align &lt;- p_link_row_align + scale_y_common_align\np_link_column_align &lt;- p_link_column_align + scale_y_common_align\np_abundance_align &lt;- p_abundance + scale_y_common_align\n\n\nt_row_align +\n  p_link_row_align +\n  p_abundance_align +\n  p_link_column_align +\n  t_column_align +\n  patchwork::plot_layout(nrow = 1, widths = c(1, 0.25, 1, 0.25, 1))",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>ggbipartiteで始める二部ネットワーク可視化</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-visualization-ja.html#応用編-系統樹スケールを維持した可視化",
+    "href": "ggbipartite-visualization-ja.html#応用編-系統樹スケールを維持した可視化",
+    "title": "ggbipartiteで始める二部ネットワーク可視化",
+    "section": "応用編: 系統樹スケールを維持した可視化",
+    "text": "応用編: 系統樹スケールを維持した可視化\nこの章で使う主な関数:\n\ngeom_bipnet_interaction(): tip_positions_row/column で tree 由来 y 座標に合わせます。\ngeom_bipnet_point(): binary ノード位置を同じ tip 座標へ固定します。\nget_yrange(): tree と network の y 範囲を共通化します。\nggtree(): tip 座標テーブル（label, y）抽出に使います。\n\n前節では adjust_tree() で系統樹をネットワーク側のスケールに合わせました。\nここでは逆に、系統樹の tip の y 座標を基準にして ネットワーク側を合わせる方法を示します。この場合は link が不要です。 また、abundance の場合は現実的な調整が難しいため、binary で使う前提です。\n\nhost_tip_positions &lt;- ggtree(host_phylo)$data |&gt;\n  filter(!is.na(isTip) & isTip) |&gt;\n  transmute(\n    label = as.character(label),\n    y = as.numeric(y)\n  ) |&gt;\n  group_by(label) |&gt;\n  summarise(y = mean(y), .groups = \"drop\")\n\nsymbiont_tip_positions &lt;- ggtree(symbiont_phylo)$data |&gt;\n  filter(!is.na(isTip) & isTip) |&gt;\n  transmute(\n    label = as.character(label),\n    y = as.numeric(y)\n  ) |&gt;\n  group_by(label) |&gt;\n  summarise(y = mean(y), .groups = \"drop\")\n\np_binary_tree_scale &lt;- ggplot(\n  binary_df,\n  aes(row = row, column = column, count = count)\n) +\n  geom_bipnet_interaction(\n    interaction_type = \"binary\",\n    tip_positions_row = host_tip_positions,\n    tip_positions_column = symbiont_tip_positions,\n    linewidth = 0.45,\n    alpha = 0.7,\n    show.legend = FALSE\n  ) +\n  geom_bipnet_point(\n    type = \"row\",\n    tip_positions_row = host_tip_positions,\n    tip_positions_column = symbiont_tip_positions,\n    fill = \"steelblue\",\n    size = 2.4\n  ) +\n  geom_bipnet_point(\n    type = \"column\",\n    tip_positions_row = host_tip_positions,\n    tip_positions_column = symbiont_tip_positions,\n    fill = \"navy\",\n    size = 2.4\n  ) +\n  theme_void()\n\nt_row_tree_scale &lt;- ggtree(host_phylo) +\n  geom_tiplab(\n    align = TRUE,\n    linetype = \"dotted\",\n    size = 3\n  )\n\nt_column_tree_scale &lt;- ggtree(symbiont_phylo) +\n  geom_tiplab(\n    align = TRUE,\n    linetype = \"dotted\",\n    hjust = 1,\n    size = 3\n  ) +\n  scale_x_reverse()\n\nylim_tree_scale &lt;- range(\n  c(\n    get_yrange(t_row_tree_scale),\n    get_yrange(t_column_tree_scale),\n    get_yrange(p_binary_tree_scale)\n  ),\n  na.rm = TRUE\n)\n\nscale_y_tree_scale &lt;- scale_y_continuous(\n  limits = ylim_tree_scale,\n  expand = expansion(mult = 0)\n)\n\nt_row_tree_scale &lt;- t_row_tree_scale + scale_y_tree_scale\nt_column_tree_scale &lt;- t_column_tree_scale + scale_y_tree_scale\np_binary_tree_scale &lt;- p_binary_tree_scale + scale_y_tree_scale\n\n\nt_row_tree_scale +\n  p_binary_tree_scale +\n  t_column_tree_scale +\n  plot_layout(nrow = 1, widths = c(1, 1, 1))",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>ggbipartiteで始める二部ネットワーク可視化</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-visualization-ja.html#よくあるつまずき",
+    "href": "ggbipartite-visualization-ja.html#よくあるつまずき",
+    "title": "ggbipartiteで始める二部ネットワーク可視化",
+    "section": "よくあるつまずき",
+    "text": "よくあるつまずき\nこの章で参照する主な関数:\n\nget_tip_order(): tree と行列の順序不一致を確認します。\nafter_stat(): metadata 列参照に必要な点を再確認します。\ngeom_bipnet_*(): gap, row_nm, column_nm の指定ミスを切り分けます。\n\n\n系統樹の tip ラベルと行列の行名・列名が一致していない\nget_tip_order() の返り値と rownames() / colnames() を照合する。\nfactor(levels = ...) と行列ソートを行っていない\n順序がズレて tree と network の対応が崩れる。\nレイヤーごとに gap が違う\nボックスと相互作用の位置がズレるため、同じ値を使う。\nmetadata のキー名が row_nm / column_nm と一致していない\nafter_stat() で参照する列が生成されない。",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>ggbipartiteで始める二部ネットワーク可視化</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-visualization-ja.html#まとめ",
+    "href": "ggbipartite-visualization-ja.html#まとめ",
+    "title": "ggbipartiteで始める二部ネットワーク可視化",
+    "section": "まとめ",
+    "text": "まとめ\nこの章で再確認する主要関数:\n\nto_longer()\ngeom_bipnet_box()\ngeom_bipnet_interaction()\ngeom_bipnet_point()\nadjust_tree() / create_link()\n\nggbipartite は、次の順番で使うと安定します。\n\n先に系統樹を描いて左右の意味を固定する\nfactor と行列ソートで順序を揃える\nrow / column / count を明示して基本図を作る\n必要に応じて metadata・binary・系統樹連携へ拡張する\n\nこの vignette をテンプレートにすれば、実データにもそのまま移植できます。",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>ggbipartiteで始める二部ネットワーク可視化</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-publishable-ja.html",
+    "href": "ggbipartite-publishable-ja.html",
+    "title": "ggbipartiteで作るPublishableな系統樹×二者ネットワーク図",
+    "section": "",
+    "text": "事前準備\nこの vignette では、ggbipartite と ggtree を組み合わせて、 投稿図として使いやすい品質の図を作る発展例を示します。\n扱う内容:\nlibrary(tidyverse)\nlibrary(cowplot)\nlibrary(ape)\nlibrary(ggtree)\nlibrary(marquee)\nlibrary(RPANDA)\nlibrary(ggbipartite)",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>ggbipartiteで作るPublishableな系統樹×二者ネットワーク図</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-publishable-ja.html#データと系統樹を作る",
+    "href": "ggbipartite-publishable-ja.html#データと系統樹を作る",
+    "title": "ggbipartiteで作るPublishableな系統樹×二者ネットワーク図",
+    "section": "データと系統樹を作る",
+    "text": "データと系統樹を作る\nこの章で使う主な関数:\n\nrtree(): 例示用の系統樹を作成します。\nget_tip_order(): 系統樹と行列の並び順を揃えます。\nto_longer(): 行列を row-column-count 形式へ変換します。\n\n\nset.seed(20260304)\n\nhost_phylo &lt;- rtree(10)\nhost_phylo$tip.label &lt;- paste0(\"Host_\", sprintf(\"%02d\", 1:10))\nhost_phylo$node.label &lt;- sample(70:100, host_phylo$Nnode, replace = TRUE)\n\nsymbiont_phylo &lt;- rtree(6)\nsymbiont_phylo$tip.label &lt;- paste0(\"OTU_\", sprintf(\"%02d\", 1:6))\nsymbiont_phylo$node.label &lt;- sample(70:100, symbiont_phylo$Nnode, replace = TRUE)\n\nhost_order &lt;- get_tip_order(host_phylo) |&gt; rev()\nsymbiont_order &lt;- get_tip_order(symbiont_phylo) |&gt; rev()\n\ninteraction_matrix_raw &lt;- matrix(\n  c(\n    120, 0, 40, 0, 15, 0,\n    40, 2, 0, 0, 6, 1,\n    0, 12, 0, 4, 0, 0,\n    8, 0, 0, 22, 0, 5,\n    0, 0, 5, 8, 18, 0,\n    65, 0, 20, 0, 3, 0,\n    0, 7, 2, 0, 0, 13,\n    4, 0, 0, 30, 0, 0,\n    0, 0, 8, 3, 25, 2,\n    20, 1, 0, 0, 10, 0\n  ),\n  nrow = 10,\n  byrow = TRUE,\n  dimnames = list(\n    paste0(\"Host_\", sprintf(\"%02d\", 1:10)),\n    paste0(\"OTU_\", sprintf(\"%02d\", 1:6))\n  )\n)\n\ninteraction_matrix &lt;- interaction_matrix_raw[\n  host_order,\n  symbiont_order,\n  drop = FALSE\n]\n\nmetadata_row &lt;- tibble(\n  host = rownames(interaction_matrix),\n  host_lineage = c(rep(\"Lineage_A\", 6), rep(\"Lineage_B\", 4))\n)\n\nmetadata_row\n\n# A tibble: 10 × 2\n   host    host_lineage\n   &lt;chr&gt;   &lt;chr&gt;       \n 1 Host_10 Lineage_A   \n 2 Host_09 Lineage_A   \n 3 Host_08 Lineage_A   \n 4 Host_07 Lineage_A   \n 5 Host_06 Lineage_A   \n 6 Host_05 Lineage_A   \n 7 Host_04 Lineage_B   \n 8 Host_03 Lineage_B   \n 9 Host_02 Lineage_B   \n10 Host_01 Lineage_B   \n\nmetadata_column &lt;- tibble(\n  symbiont = colnames(interaction_matrix),\n  guild = c(\"AMF\", \"AMF\", \"ECM\", \"ECM\", \"Saprotroph\", \"Unknown\")\n)\n\nmetadata_column\n\n# A tibble: 6 × 2\n  symbiont guild     \n  &lt;chr&gt;    &lt;chr&gt;     \n1 OTU_04   AMF       \n2 OTU_03   AMF       \n3 OTU_05   ECM       \n4 OTU_02   ECM       \n5 OTU_01   Saprotroph\n6 OTU_06   Unknown   \n\ninteraction_df &lt;- to_longer(interaction_matrix, .rowname = \"row\") |&gt;\n  rename(count = interaction) |&gt;\n  mutate(\n    row = factor(row, levels = rownames(interaction_matrix)),\n    column = factor(column, levels = colnames(interaction_matrix))\n  )\n\nbinary_matrix &lt;- (interaction_matrix &gt; 0) * 1L\n\nbinary_df &lt;- to_longer(binary_matrix, .rowname = \"row\") |&gt;\n  rename(count = interaction) |&gt;\n  mutate(\n    row = factor(row, levels = rownames(binary_matrix)),\n    column = factor(column, levels = colnames(binary_matrix))\n  )",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>ggbipartiteで作るPublishableな系統樹×二者ネットワーク図</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-publishable-ja.html#系統樹を注釈する",
+    "href": "ggbipartite-publishable-ja.html#系統樹を注釈する",
+    "title": "ggbipartiteで作るPublishableな系統樹×二者ネットワーク図",
+    "section": "系統樹を注釈する",
+    "text": "系統樹を注釈する\nこの章で使う主な関数:\n\ngeom_tiplab(align = TRUE): tip ラベルを整列表示します。\ngeom_treescale(): 枝長スケールを図に追加します。\ngeom_nodelab(): 内部ノード bootstrap 値を表示します。\n\n\nlabel_family &lt;- \"Arial\"\ntip_text_size &lt;- 3.5\nnode_text_size &lt;- 3\n\nhost_tree_base &lt;- ggtree(host_phylo)\nhost_tree_span &lt;- diff(range(host_tree_base$data$x, na.rm = TRUE))\n\nhost_tree_annotated &lt;- host_tree_base +\n  geom_tiplab(\n    align = TRUE,\n    linetype = \"dotted\",\n    family = label_family,\n    size = tip_text_size\n  ) +\n  geom_nodelab(\n    aes(label = label),\n    node = \"internal\",\n    family = label_family,\n    size = node_text_size,\n    colour = \"black\",\n    nudge_x = host_tree_span * 0.01,\n    hjust = 0.5\n  ) +\n  geom_treescale(\n    x = 0.1,\n    y = 0,\n    width = 0.1,\n    fontsize = tip_text_size,\n    family = label_family\n  ) +\n  coord_cartesian(clip = \"off\")\n\nhost_tree_annotated",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>ggbipartiteで作るPublishableな系統樹×二者ネットワーク図</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-publishable-ja.html#marqueeでtipnodeラベルの見た目を揃える",
+    "href": "ggbipartite-publishable-ja.html#marqueeでtipnodeラベルの見た目を揃える",
+    "title": "ggbipartiteで作るPublishableな系統樹×二者ネットワーク図",
+    "section": "marqueeでtip/nodeラベルの見た目を揃える",
+    "text": "marqueeでtip/nodeラベルの見た目を揃える\nこの章で使う主な関数:\n\nadjust_tree(): tree を bipartite ボックスへ整列します。\n.tiplab_segment_data(): align 用の補助線座標を作ります。\n.tiplab_marquee_data(): geom_marquee() 用 tip 座標を作ります。\ngeom_marquee(): tip ラベルを同一フォントで安定描画します。\n\n以降のコードでは、関数を定義せずに各チャンク内で直接 adjust_tree() / geom_marquee() / geom_nodelab() / geom_treescale() を組み合わせます。",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>ggbipartiteで作るPublishableな系統樹×二者ネットワーク図</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-publishable-ja.html#abundance版の図を作る",
+    "href": "ggbipartite-publishable-ja.html#abundance版の図を作る",
+    "title": "ggbipartiteで作るPublishableな系統樹×二者ネットワーク図",
+    "section": "abundance版の図を作る",
+    "text": "abundance版の図を作る\nこの章で使う主な関数:\n\nconstruct_bn_coordination(): row / column / interaction 座標を作成します。\ngeom_bipnet_box(): row / column ボックスを描きます。\ngeom_bipnet_interaction(): abundance ポリゴンを描きます。\ncreate_link(): tree と box を結ぶリンク座標を作ります。\nget_yrange(): パネル間の y 軸を統一します。\n\n\ngap_abundance &lt;- sum(interaction_matrix) / 12\n\nbn_coords_abundance &lt;- construct_bn_coordination(\n  .mat = interaction_matrix,\n  .row = \"host\",\n  .column = \"symbiont\",\n  .metadata_row = metadata_row,\n  .metadata_column = metadata_column,\n  .gap = gap_abundance\n)\n\nt_host_abundance_base &lt;- adjust_tree(\n  .phylo = host_phylo,\n  .box = bn_coords_abundance$row_box,\n  .adjust = 1,\n  .tree_position = \"left\"\n)\n\nx_span_host_abundance &lt;- diff(range(t_host_abundance_base$data$x, na.rm = TRUE))\n\nt_host_abundance &lt;- t_host_abundance_base +\n  geom_segment(\n    data = function(df) .tiplab_segment_data(df, offset = 0),\n    aes(x = x, xend = xend, y = y, yend = yend),\n    linetype = \"dotted\",\n    linewidth = 0.35,\n    colour = \"grey45\",\n    inherit.aes = FALSE\n  ) +\n  geom_marquee(\n    data = function(df) .tiplab_marquee_data(df, offset = 0),\n    aes(x = x_lab, y = y, label = label),\n    inherit.aes = FALSE,\n    hjust = 0,\n    family = label_family,\n    size = tip_text_size\n  ) +\n  geom_nodelab(\n    aes(label = label),\n    node = \"internal\",\n    nudge_x = x_span_host_abundance * 0.05,\n    hjust = 0.5,\n    family = label_family,\n    size = node_text_size\n  ) +\n  coord_cartesian(clip = \"off\")\n\nt_symbiont_abundance_base &lt;- adjust_tree(\n  .phylo = symbiont_phylo,\n  .box = bn_coords_abundance$column_box,\n  .adjust = 1,\n  .tree_position = \"right\"\n)\n\nx_span_symbiont_abundance &lt;- diff(range(t_symbiont_abundance_base$data$x, na.rm = TRUE))\n\nt_symbiont_abundance &lt;- t_symbiont_abundance_base +\n  geom_segment(\n    data = function(df) .tiplab_segment_data(df, offset = 0),\n    aes(x = x, xend = xend, y = y, yend = yend),\n    linetype = \"dotted\",\n    linewidth = 0.35,\n    colour = \"grey45\",\n    inherit.aes = FALSE\n  ) +\n  geom_marquee(\n    data = function(df) .tiplab_marquee_data(df, offset = 0),\n    aes(x = x_lab, y = y, label = label),\n    inherit.aes = FALSE,\n    hjust = 1,\n    family = label_family,\n    size = tip_text_size\n  ) +\n  geom_nodelab(\n    aes(label = label),\n    node = \"internal\",\n    nudge_x = -x_span_symbiont_abundance * 0.05,\n    hjust = 0.5,\n    family = label_family,\n    size = node_text_size,\n    colour = \"grey20\"\n  ) +\n  coord_cartesian(clip = \"off\")\n\nlink_host &lt;- create_link(\n  box = bn_coords_abundance$row_box,\n  ggtree = t_host_abundance,\n  side = \"row\",\n  x = 1,\n  xend = 0\n)\n\nlink_symbiont &lt;- create_link(\n  box = bn_coords_abundance$column_box,\n  ggtree = t_symbiont_abundance,\n  side = \"column\",\n  x = 0,\n  xend = 1\n)\n\np_link_host &lt;- ggplot(link_host) +\n  geom_segment(\n    aes(x = x, y = y1, xend = xend, yend = y2, group = row),\n    linetype = \"dotted\",\n    linewidth = 0.35,\n    colour = \"grey45\"\n  ) +\n  geom_point(aes(x = x, y = y1), size = 0.7, colour = \"grey30\") +\n  geom_point(aes(x = xend, y = y2), size = 0.7, colour = \"grey30\") +\n  theme_void()\n\np_link_symbiont &lt;- ggplot(link_symbiont) +\n  geom_segment(\n    aes(x = x, y = y1, xend = xend, yend = y2, group = column),\n    linetype = \"dotted\",\n    linewidth = 0.35,\n    colour = \"grey45\"\n  ) +\n  geom_point(aes(x = x, y = y1), size = 0.7, colour = \"grey30\") +\n  geom_point(aes(x = xend, y = y2), size = 0.7, colour = \"grey30\") +\n  theme_void()\n\np_abundance_publishable &lt;- ggplot(\n  interaction_df,\n  aes(row = row, column = column, count = count)\n) +\n  geom_bipnet_box(\n    aes(fill = after_stat(host_lineage)),\n    type = \"row\",\n    row_nm = \"host\",\n    metadata_row = metadata_row,\n    gap = gap_abundance,\n    linewidth = 0.25,\n    colour = \"grey20\"\n  ) +\n  geom_bipnet_box(\n    type = \"column\",\n    gap = gap_abundance,\n    fill = \"#223A5E\",\n    linewidth = 0.25,\n    colour = \"grey20\"\n  ) +\n  geom_bipnet_interaction(\n    aes(fill = after_stat(host_lineage)),\n    row_nm = \"host\",\n    metadata_row = metadata_row,\n    gap = gap_abundance,\n    alpha = 0.45,\n    linewidth = 0.1,\n    colour = \"grey35\",\n    show.legend = FALSE\n  ) +\n  scale_fill_manual(\n    name = \"Host lineage\",\n    values = c(\"Lineage_A\" = \"#4E79A7\", \"Lineage_B\" = \"#F28E2B\")\n  ) +\n  theme_void(base_family = label_family)\n\nlegend &lt;- get_legend(p_abundance_publishable)\np_abundance_publishable &lt;- p_abundance_publishable + theme(legend.position = \"none\")\n\nylim_abundance &lt;- range(\n  c(\n    get_yrange(t_host_abundance),\n    get_yrange(t_symbiont_abundance),\n    get_yrange(p_abundance_publishable)\n  ),\n  na.rm = TRUE\n)\n\nscale_y_abundance &lt;- scale_y_continuous(\n  limits = ylim_abundance,\n  expand = expansion(mult = 0)\n)\n\nt_host_abundance &lt;- t_host_abundance + scale_y_abundance\nt_symbiont_abundance &lt;- t_symbiont_abundance + scale_y_abundance\np_link_host &lt;- p_link_host + scale_y_abundance\np_link_symbiont &lt;- p_link_symbiont + scale_y_abundance\np_abundance_publishable &lt;- p_abundance_publishable + scale_y_abundance\n\nt_host_abundance +\n  p_link_host +\n  p_abundance_publishable +\n  p_link_symbiont +\n  t_symbiont_abundance +\n  legend + \n  patchwork::plot_layout(nrow = 1, widths = c(1, 0.28, 1.15, 0.28, 1, 0.2))",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>ggbipartiteで作るPublishableな系統樹×二者ネットワーク図</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-publishable-ja.html#binary版の図を作る",
+    "href": "ggbipartite-publishable-ja.html#binary版の図を作る",
+    "title": "ggbipartiteで作るPublishableな系統樹×二者ネットワーク図",
+    "section": "binary版の図を作る",
+    "text": "binary版の図を作る\nこの章で使う主な関数:\n\ngeom_bipnet_interaction(interaction_type = \"binary\"): 二値相互作用を線分として描画します。\ngeom_bipnet_point(): row / column ノードを点で描画します。\ntip_positions_row / tip_positions_column: 系統樹由来の y 座標を直接ネットワークへ適用します。\nmetadata_row + after_stat(host_lineage): binary でも host lineage による色分けが可能です。\nggtree(): 枝長スケールを保持した tree パネルを構築します。\n\n\nhost_tip_positions &lt;- ggtree(host_phylo)$data |&gt;\n  filter(!is.na(.data$isTip) & .data$isTip) |&gt;\n  transmute(\n    label = as.character(.data$label),\n    y = as.numeric(.data$y)\n  ) |&gt;\n  group_by(.data$label) |&gt;\n  summarise(y = mean(.data$y), .groups = \"drop\")\n\nsymbiont_tip_positions &lt;- ggtree(symbiont_phylo)$data |&gt;\n  filter(!is.na(.data$isTip) & .data$isTip) |&gt;\n  transmute(\n    label = as.character(.data$label),\n    y = as.numeric(.data$y)\n  ) |&gt;\n  group_by(.data$label) |&gt;\n  summarise(y = mean(.data$y), .groups = \"drop\")\n\np_binary_publishable &lt;- ggplot(\n  binary_df,\n  aes(row = row, column = column, count = count)\n) +\n  geom_bipnet_interaction(\n    aes(colour = after_stat(host_lineage)),\n    interaction_type = \"binary\",\n    row_nm = \"host\",\n    metadata_row = metadata_row,\n    tip_positions_row = host_tip_positions,\n    tip_positions_column = symbiont_tip_positions,\n    linewidth = 0.5,\n    alpha = 0.8,\n    show.legend = FALSE\n  ) +\n  geom_bipnet_point(\n    aes(fill = after_stat(host_lineage)),\n    type = \"row\",\n    row_nm = \"host\",\n    metadata_row = metadata_row,\n    tip_positions_row = host_tip_positions,\n    tip_positions_column = symbiont_tip_positions,\n    colour = \"white\",\n    stroke = 0.2,\n    size = 2.8\n  ) +\n  geom_bipnet_point(\n    type = \"column\",\n    tip_positions_row = host_tip_positions,\n    tip_positions_column = symbiont_tip_positions,\n    fill = \"#59A14F\",\n    colour = \"white\",\n    stroke = 0.2,\n    size = 2.8\n  ) +\n  scale_colour_manual(\n    values = c(\"Lineage_A\" = \"#4E79A7\", \"Lineage_B\" = \"#F28E2B\"),\n    guide = \"none\"\n  ) +\n  scale_fill_manual(\n    values = c(\"Lineage_A\" = \"#4E79A7\", \"Lineage_B\" = \"#F28E2B\"),\n    name = \"Host lineage\"\n  ) +\n  theme_void(base_family = label_family) +\n  theme(\n    plot.margin = margin(5.5, 15, 5.5, 15),\n    legend.position = \"bottom\"\n  )\n\nt_host_binary_base &lt;- ggtree(host_phylo)\nx_span_host_binary &lt;- diff(range(t_host_binary_base$data$x, na.rm = TRUE))\n\nt_host_binary &lt;- t_host_binary_base +\n  geom_segment(\n    data = function(df) .tiplab_segment_data(df, offset = 0),\n    aes(x = x, xend = xend, y = y, yend = yend),\n    linetype = \"dotted\",\n    linewidth = 0.35,\n    colour = \"grey45\",\n    inherit.aes = FALSE\n  ) +\n  geom_marquee(\n    data = function(df) .tiplab_marquee_data(df, offset = 0),\n    aes(x = x_lab, y = y, label = label),\n    inherit.aes = FALSE,\n    hjust = 0,\n    family = label_family,\n    size = tip_text_size\n  ) +\n  geom_nodelab(\n    aes(label = label),\n    node = \"internal\",\n    nudge_x = x_span_host_binary * 0.05,\n    hjust = 0.5,\n    family = label_family,\n    size = node_text_size,\n    colour = \"grey20\"\n  ) +\n  geom_treescale(\n    x = 0.2,\n    y = 0.1,\n    width = 0.2,\n    fontsize = tip_text_size,\n    family = label_family\n  ) +\n  coord_cartesian(clip = \"off\")\n\nt_symbiont_binary_base &lt;- ggtree(symbiont_phylo)\nx_span_symbiont_binary &lt;- diff(range(t_symbiont_binary_base$data$x, na.rm = TRUE))\n\nt_symbiont_binary &lt;- t_symbiont_binary_base +\n  geom_segment(\n    data = function(df) .tiplab_segment_data(df, offset = 0),\n    aes(x = x, xend = xend, y = y, yend = yend),\n    linetype = \"dotted\",\n    linewidth = 0.35,\n    colour = \"grey45\",\n    inherit.aes = FALSE\n  ) +\n  geom_marquee(\n    data = function(df) .tiplab_marquee_data(df, offset = 0),\n    aes(x = x_lab, y = y, label = label),\n    inherit.aes = FALSE,\n    hjust = 1,\n    family = label_family,\n    size = tip_text_size\n  ) +\n  geom_nodelab(\n    aes(label = label),\n    node = \"internal\",\n    nudge_x = -x_span_symbiont_binary * 0.05,\n    hjust = 0.5,\n    family = label_family,\n    size = node_text_size,\n    colour = \"grey20\"\n  ) +\n  geom_treescale(\n    x = -0.4,\n    y = 0.1,\n    width = 0.2,\n    fontsize = tip_text_size,\n    family = label_family\n  ) +\n  coord_cartesian(clip = \"off\") +\n  scale_x_reverse()\n\nylim_binary &lt;- range(\n  c(\n    get_yrange(t_host_binary),\n    get_yrange(t_symbiont_binary),\n    get_yrange(p_binary_publishable)\n  ),\n  na.rm = TRUE\n)\n\nscale_y_binary &lt;- scale_y_continuous(\n  limits = ylim_binary,\n  expand = expansion(mult = 0)\n)\n\nt_host_binary &lt;- t_host_binary + scale_y_binary\nt_symbiont_binary &lt;- t_symbiont_binary + scale_y_binary\np_binary_publishable &lt;- p_binary_publishable + scale_y_binary\n\nt_host_binary +\n  p_binary_publishable +\n  t_symbiont_binary +\n  patchwork::plot_layout(nrow = 1, widths = c(1, 1.2, 1))",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>ggbipartiteで作るPublishableな系統樹×二者ネットワーク図</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-publishable-ja.html#binary-rpandaシグナルを重ねるgeom_nodepoint",
+    "href": "ggbipartite-publishable-ja.html#binary-rpandaシグナルを重ねるgeom_nodepoint",
+    "title": "ggbipartiteで作るPublishableな系統樹×二者ネットワーク図",
+    "section": "binary + RPANDAシグナルを重ねる（geom_nodepoint()）",
+    "text": "binary + RPANDAシグナルを重ねる（geom_nodepoint()）\nこの章で使う主な関数:\n\nphylosignal_sub_network(): clade 単位の相関検定を実行する関数（本章では実行せず参照のみ）。\ntribble(): デモ用の clade シグナル表をコード内で直接作成します。\ngeom_nodepoint(): 検定結果（mantel_cor）を内部ノードへ重ね描きします。\n\n\n# Example call (not executed):\n# phylosignal_sub_network(\n#   network = binary_matrix,\n#   tree_A = host_phylo,\n#   tree_B = symbiont_phylo\n# )\n\ncophylo_by_clade_plants &lt;- tribble(\n  ~data_source, ~node, ~nb_A, ~nb_B, ~mantel_cor, ~pvalue_upper, ~pvalue_lower, ~pvalue_upper_corrected, ~pvalue_lower_corrected,\n  \"ecm_erm\", 11, 5, 4, 0.62, 0.0010, 0.2400, 0.0040, 0.4400,\n  \"ecm_erm\", 12, 4, 3, -0.38, 0.0120, 0.4100, 0.0300, 0.6500,\n  \"ecm_erm\", 14, 6, 5, 0.81, 0.0005, 0.1900, 0.0020, 0.3300,\n  \"ecm_erm\", 16, 3, 2, 0.25, 0.0800, 0.5000, 0.1200, 0.7700,\n  \"rus\", 15, 4, 4, -0.55, 0.0300, 0.0100, 0.0700, 0.0300,\n  \"ecm_erm\", 18, 2, 2, -0.67, 0.0020, 0.6600, 0.0060, 0.8900\n)\n\ncophylo_by_clade_plants_sigif_upper &lt;- cophylo_by_clade_plants |&gt;\n  filter(\n    data_source == \"ecm_erm\",\n    pvalue_upper_corrected &lt; 0.05\n  )\n\ncophylo_by_clade_plants_sigif_upper\n\n# A tibble: 4 × 9\n  data_source  node  nb_A  nb_B mantel_cor pvalue_upper pvalue_lower\n  &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;\n1 ecm_erm        11     5     4       0.62       0.001          0.24\n2 ecm_erm        12     4     3      -0.38       0.012          0.41\n3 ecm_erm        14     6     5       0.81       0.0005         0.19\n4 ecm_erm        18     2     2      -0.67       0.002          0.66\n# ℹ 2 more variables: pvalue_upper_corrected &lt;dbl&gt;,\n#   pvalue_lower_corrected &lt;dbl&gt;\n\ncophylo_by_clade_fungi &lt;- tribble(\n  ~data_source, ~node, ~nb_A, ~nb_B, ~mantel_cor, ~pvalue_upper, ~pvalue_lower, ~pvalue_upper_corrected, ~pvalue_lower_corrected,\n  \"ecm_erm\", 7, 4, 4, 0.58, 0.0040, 0.2000, 0.0100, 0.3100,\n  \"ecm_erm\", 8, 3, 3, -0.71, 0.0008, 0.5000, 0.0030, 0.8000,\n  \"ecm_erm\", 9, 2, 2, 0.33, 0.0300, 0.4100, 0.0490, 0.7500,\n  \"ecm_erm\", 10, 2, 2, 0.12, 0.2000, 0.6000, 0.2900, 0.8800,\n  \"rus\", 11, 2, 3, -0.47, 0.0400, 0.0300, 0.0900, 0.0500\n)\n\ncophylo_by_clade_fungi_sigif_upper &lt;- cophylo_by_clade_fungi |&gt;\n  filter(\n    data_source == \"ecm_erm\",\n    pvalue_upper_corrected &lt; 0.05\n  )\n\ncophylo_by_clade_fungi_sigif_upper\n\n# A tibble: 3 × 9\n  data_source  node  nb_A  nb_B mantel_cor pvalue_upper pvalue_lower\n  &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;\n1 ecm_erm         7     4     4       0.58       0.004          0.2 \n2 ecm_erm         8     3     3      -0.71       0.0008         0.5 \n3 ecm_erm         9     2     2       0.33       0.03           0.41\n# ℹ 2 more variables: pvalue_upper_corrected &lt;dbl&gt;,\n#   pvalue_lower_corrected &lt;dbl&gt;\n\ncor_limits &lt;- range(\n  c(\n    cophylo_by_clade_plants_sigif_upper$mantel_cor,\n    cophylo_by_clade_fungi_sigif_upper$mantel_cor\n  ),\n  na.rm = TRUE\n)\nif (diff(cor_limits) == 0) {\n  cor_limits &lt;- cor_limits + c(-1e-6, 1e-6)\n}\n\ncommon_scale &lt;- list(\n  scale_color_gradient2(\n    name = NULL,\n    low = \"#0568b3\",\n    mid = \"#F7F7F7\",\n    high = \"#d60205\",\n    midpoint = 0,\n    limits = c(-1, 1),\n    breaks = c(-1, -0.5, 0, 0.5, 1)\n  ),\n  scale_size(\n    name = \"Pearson's correlation\",\n    range = c(1, 5),\n    limits = cor_limits\n  )\n)\n\nt_host_binary_signal &lt;- t_host_binary %&lt;+%\n  cophylo_by_clade_plants_sigif_upper +\n  geom_nodepoint(aes(size = mantel_cor, colour = mantel_cor)) +\n  common_scale +\n  theme(\n    legend.position = \"bottom\",\n    legend.title.position = \"top\"\n  )\n\nt_symbiont_binary_signal &lt;- t_symbiont_binary %&lt;+%\n  cophylo_by_clade_fungi_sigif_upper +\n  geom_nodepoint(aes(size = mantel_cor, colour = mantel_cor)) +\n  common_scale +\n  theme(legend.position = \"none\")\n\nt_host_binary_signal +\n  p_binary_publishable +\n  t_symbiont_binary_signal +\n  patchwork::plot_layout(nrow = 1, widths = c(1, 1.2, 1))",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>ggbipartiteで作るPublishableな系統樹×二者ネットワーク図</span>"
+    ]
+  },
+  {
+    "objectID": "ggbipartite-publishable-ja.html#出力時の実務メモ",
+    "href": "ggbipartite-publishable-ja.html#出力時の実務メモ",
+    "title": "ggbipartiteで作るPublishableな系統樹×二者ネットワーク図",
+    "section": "出力時の実務メモ",
+    "text": "出力時の実務メモ\nこの章で使う主な関数:\n\nggsave(): 論文図として保存します。\ndevice = cairo_pdf: 文字埋め込みや線描画を安定化できます。\n\n\nggsave(\n  filename = \"plots/network.pdf\",\n  plot = p_otu_composition,\n  device = grDevices::cairo_pdf,\n  width = 9.6,\n  height = 7.2,\n  units = \"in\",\n  limitsize = FALSE,\n  bg = \"transparent\"\n)",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>ggbipartiteで作るPublishableな系統樹×二者ネットワーク図</span>"
+    ]
+  },
+  {
+    "objectID": "session-info.html",
+    "href": "session-info.html",
+    "title": "Session info",
+    "section": "",
+    "text": "再現性のため、本書をレンダリングした実行環境情報を記録します。\n\nsessionInfo()\n\nR version 4.5.1 (2025-06-13)\nPlatform: aarch64-apple-darwin20\nRunning under: macOS Tahoe 26.4\n\nMatrix products: default\nBLAS:   /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRblas.0.dylib \nLAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1\n\nlocale:\n[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8\n\ntime zone: Asia/Tokyo\ntzcode source: internal\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nloaded via a namespace (and not attached):\n [1] htmlwidgets_1.6.4 compiler_4.5.1    fastmap_1.2.0     cli_3.6.5        \n [5] tools_4.5.1       htmltools_0.5.8.1 rstudioapi_0.17.1 yaml_2.3.10      \n [9] rmarkdown_2.29    knitr_1.50        jsonlite_2.0.0    xfun_0.53        \n[13] digest_0.6.37     rlang_1.1.6       evaluate_1.0.4",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Session info</span>"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Visualise cophylogenetic signals",
+    "section": "",
+    "text": "はじめに",
+    "crumbs": [
+      "はじめに"
+    ]
+  },
+  {
+    "objectID": "index.html#収録チャプター",
+    "href": "index.html#収録チャプター",
+    "title": "Visualise cophylogenetic signals",
+    "section": "収録チャプター",
+    "text": "収録チャプター\n本編は次の 4 章で進みます。\n\nggbipartite で始める二部ネットワーク可視化\nggbipartite で作る Publishable な系統樹 × 二者ネットワーク図\n学名付きの系統樹ラベルを整える\nSession info（実行環境）\n\n\n# pak::pak(\"Hide-Fun/ggbipartite\")\npackageVersion(\"ggbipartite\")\n\n[1] '0.9.5'",
+    "crumbs": [
+      "はじめに"
+    ]
+  }
+]

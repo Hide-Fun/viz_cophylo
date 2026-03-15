@@ -1,0 +1,52 @@
+project:
+  type: book
+
+book:
+  title: "Visualise cophylogenetic signals"
+  subtitle: "Phylogeny x Bipartite Network Workflows"
+  page-navigation: true
+  search: true
+  sidebar:
+    style: docked
+    collapse-level: 2
+  chapters:
+    - index.qmd
+    - ggbipartite-visualization-ja.qmd
+    - ggbipartite-publishable-ja.qmd
+    - ggbipartite-sciname-tree-ja.qmd
+    - session-info.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme:
+      - litera
+      - styles-modern.scss
+    toc: true
+    toc-depth: 3
+    number-sections: false
+    code-copy: true
+    code-overflow: wrap
+    smooth-scroll: true
+    anchor-sections: true
+    link-external-newwindow: true
+    embed-resources: true
+    grid:
+      sidebar-width: 320px
+      body-width: 980px
+      margin-width: 240px
+  pdf:
+    pdf-engine: lualatex
+    documentclass: bxjsbook
+    classoption: lualatex, ja=standard, jafont=BIZ UDGothic
+    include-in-header:
+      - text: |
+          \setmainfont{Times New Roman}[
+            SmallCapsFont={STIX Two Text},
+            SmallCapsFeatures={Letters=SmallCaps},
+          ]
+    monofont: Monaspace Neon Var
+    urlcolor: teal
+    citecolor: teal
+editor: visual

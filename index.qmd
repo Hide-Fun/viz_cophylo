@@ -1,0 +1,25 @@
+# はじめに {.unnumbered}
+
+## 収録チャプター
+
+```{r}
+#| label: setup
+#| include: false
+
+knitr::opts_chunk$set(
+  dev = "ragg_png",
+  dpi = 300
+)
+```
+
+本編は次の 4 章で進みます。
+
+1.  `ggbipartite` で始める二部ネットワーク可視化
+2.  `ggbipartite` で作る Publishable な系統樹 × 二者ネットワーク図
+3.  学名付きの系統樹ラベルを整える
+4.  Session info（実行環境）
+
+```{r}
+# pak::pak("Hide-Fun/ggbipartite")
+packageVersion("ggbipartite")
+```
