@@ -1,30 +1,13 @@
 ---
 title: "ggbipartiteで始める二部ネットワーク可視化"
-execute:
-  echo: true
-  warning: false
-  message: false
-  fig-dpi: 350
-embed-resources: true
-vignette: >
-  %\VignetteIndexEntry{ggbipartiteで始める二部ネットワーク可視化}
-  %\VignetteEngine{quarto::html}
-  %\VignetteEncoding{UTF-8}
 ---
 
-この vignette は、`ggbipartite` を使った二部ネットワーク可視化を 初心者向けに段階的に解説します。
-
-最終的に、次の 4 パターンを自分のデータで再現できる状態を目指します。
-
-1.  abundance（量）を反映した基本可視化
-2.  メタデータに基づく色分け
-3.  binary（有無）に特化した可視化
-4.  系統樹とネットワークの対応づけ
-
-## 事前準備
+## 必要なパッケージ
 
 ```{r}
 #| label: setup
+#| message: false
+#| warning: false
 library(ggplot2)
 library(dplyr)
 library(tidyr)
@@ -34,6 +17,15 @@ library(ggtree)
 library(ggbipartite)
 library(patchwork)
 ```
+
+この vignette は、`ggbipartite` を使った二部ネットワーク可視化を 初心者向けに段階的に解説します。
+
+最終的に、次の 4 パターンを自分のデータで再現できる状態を目指します。
+
+1.  abundance（量）を反映した基本可視化
+2.  メタデータに基づく色分け
+3.  binary（有無）に特化した可視化
+4.  系統樹とネットワークの対応づけ
 
 ## まず系統樹を可視化して全体像を掴む
 
@@ -93,6 +85,7 @@ if (requireNamespace("patchwork", quietly = TRUE)) {
 
 ```{r}
 #| label: matrix-alignment
+# 系統樹の tip 順と行列の行列順を明示的にそろえる
 host_order <- get_tip_order(host_phylo) |> rev()
 symbiont_order <- get_tip_order(symbiont_phylo) |> rev()
 
@@ -411,6 +404,7 @@ p_binary
 #| label: label-annotation
 #| fig-width: 10
 #| fig-height: 5
+# 各 geom が使う内部座標を一度明示的に計算して再利用する
 bn_coords <- construct_bn_coordination(
   .mat = interaction_matrix,
   .row = "host",
@@ -439,8 +433,18 @@ ggplot(
   interaction_df,
   aes(row = row, column = column, count = count)
 ) +
-  geom_bipnet_box(type = "row", gap = gap_value, fill = "grey85", linewidth = 0.2) +
-  geom_bipnet_box(type = "column", gap = gap_value, fill = "#2C3E50", linewidth = 0.2) +
+  geom_bipnet_box(
+    type = "row",
+    gap = gap_value,
+    fill = "grey85",
+    linewidth = 0.2
+  ) +
+  geom_bipnet_box(
+    type = "column",
+    gap = gap_value,
+    fill = "#2C3E50",
+    linewidth = 0.2
+  ) +
   geom_bipnet_interaction(
     gap = gap_value,
     alpha = 0.5,
@@ -484,6 +488,7 @@ ggplot(
 
 ```{r}
 #| label: tree-link-setup
+# tree・link・network で同じ y スケールを使えるように準備する
 t_row <- adjust_tree(
   .phylo = host_phylo,
   .box = bn_coords$row_box,
@@ -669,6 +674,7 @@ t_row_align +
 
 ```{r}
 #| label: tree-scale-preserve-setup
+# tip ごとの y 座標を抽出し、binary ネットワークへ直接渡す
 host_tip_positions <- ggtree(host_phylo)$data |>
   filter(!is.na(isTip) & isTip) |>
   transmute(

@@ -1,0 +1,140 @@
+/*-- scss:defaults --*/
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap");
+
+$primary: #5fb3bd;
+$secondary: #d1946f;
+$body-bg: #0f141b;
+$body-color: #e6edf5;
+$link-color: #8ec7ff;
+$headings-color: #f3f8ff;
+$font-family-sans-serif: "Inter", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", "Meiryo", sans-serif;
+$headings-font-family: $font-family-sans-serif;
+$headings-font-weight: 700;
+$font-family-monospace: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+$code-color: #d7e6ff;
+$font-size-base: 1rem;
+
+/*-- scss:rules --*/
+body.quarto-dark {
+  --viz-surface: #151d28;
+  --viz-surface-muted: #101722;
+  --viz-border: #2b3b4f;
+  --viz-shadow: 0 18px 36px rgba(0, 0, 0, 0.35);
+}
+
+body.quarto-dark {
+  line-height: 1.75;
+  background:
+    radial-gradient(1100px 520px at 105% -20%, #112238 0%, transparent 58%),
+    radial-gradient(780px 420px at -8% -20%, #2a1e17 0%, transparent 52%),
+    #0f141b;
+}
+
+/* Keep prose consistently sans-serif in HTML body content. */
+body.quarto-dark #quarto-content p,
+body.quarto-dark #quarto-content li,
+body.quarto-dark #quarto-content dd,
+body.quarto-dark #quarto-content dt,
+body.quarto-dark #quarto-content th,
+body.quarto-dark #quarto-content td,
+body.quarto-dark #quarto-content figcaption,
+body.quarto-dark #quarto-content caption,
+body.quarto-dark #quarto-content blockquote,
+body.quarto-dark #quarto-content .callout-title-container,
+body.quarto-dark #quarto-content .callout-body-container {
+  font-family: var(--bs-body-font-family);
+}
+
+body.quarto-dark #quarto-sidebar {
+  background: rgba(16, 23, 34, 0.94);
+  border-right: 1px solid var(--viz-border);
+}
+
+body.quarto-dark .sidebar-title {
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+body.quarto-dark .sidebar .sidebar-item .sidebar-link {
+  border-radius: 0.65rem;
+  margin: 0.12rem 0.2rem;
+}
+
+body.quarto-dark .sidebar .sidebar-item .sidebar-link:hover {
+  background: #1f2a3b;
+}
+
+body.quarto-dark .sidebar .sidebar-item .sidebar-link.active {
+  background: linear-gradient(90deg, #19324b, #16273a);
+  color: #d7ebff;
+  font-weight: 700;
+}
+
+body.quarto-dark main.content {
+  background: var(--viz-surface);
+  border: 1px solid var(--viz-border);
+  border-radius: 1rem;
+  box-shadow: var(--viz-shadow);
+  padding: clamp(1rem, 1.8vw, 1.9rem);
+}
+
+body.quarto-dark #title-block-header {
+  border-bottom: 1px solid #2a3b4e;
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.8rem;
+}
+
+body.quarto-dark .quarto-title h1 {
+  letter-spacing: -0.015em;
+}
+
+body.quarto-dark .quarto-title .subtitle {
+  color: #b7c9dc;
+  font-weight: 500;
+}
+
+body.quarto-dark a {
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.16em;
+  text-decoration-color: rgba(142, 199, 255, 0.55);
+}
+
+body.quarto-dark pre.sourceCode,
+body.quarto-dark div.sourceCode,
+body.quarto-dark div.cell-output-display {
+  border: 1px solid #33495f;
+  border-radius: 0.8rem;
+  background: #0f1724;
+}
+
+body.quarto-dark .cell-output {
+  background-color: #101b2b;
+  color: #f8f9fa;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+body.quarto-dark p code,
+body.quarto-dark li code,
+body.quarto-dark td code,
+body.quarto-dark th code,
+body.quarto-dark figcaption code,
+body.quarto-dark caption code {
+  background-color: #455765;
+  color: #f8f9fa;
+  padding: 0.15em 0.35em;
+  border-radius: 0.25rem;
+}
+
+body.quarto-dark .callout {
+  border-left-width: 0.34rem;
+  border-radius: 0.8rem;
+  background: linear-gradient(180deg, #162333, #111b29);
+}
+
+@media (max-width: 991.98px) {
+  body.quarto-dark main.content {
+    border-radius: 0.8rem;
+    padding: 1rem;
+  }
+}

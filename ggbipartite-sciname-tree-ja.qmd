@@ -1,32 +1,20 @@
 ---
 title: "学名付きの系統樹ラベルを整える"
-execute:
-  echo: true
-  warning: false
-  message: false
-  fig-dpi: 350
-embed-resources: true
-vignette: >
-  %\VignetteIndexEntry{学名付きの系統樹ラベルを整える}
-  %\VignetteEngine{quarto::html}
-  %\VignetteEncoding{UTF-8}
 ---
 
-この vignette では、学名付きラベルを読みやすく整形しつつ、 `ggtree` で tip label を綺麗に配置する最小例を示します。
-
-学名部分はすべてダミーデータです。
-
-## 事前準備
+## 必要なパッケージ
 
 この章で使う主な関数:
 
 -   `style_tree_label()`: 学名ラベルを Markdown 形式で整形します。
 -   `format_node_support()`: node support 値を閾値で整形します。
--   `geom_marquee()`: Markdown ラベルを安定して描画します。
--   `.tiplab_*()`: tip label の x 座標と補助線を計算します。
+-   `geom_tipmarquee()`: tip ラベルを `marquee` で描画します。
+-   `geom_nodemarquee()`: node support ラベルを `marquee` で描画します。
 
 ```{r}
 #| label: setup
+#| message: false
+#| warning: false
 library(tidyverse)
 library(ape)
 library(ggtree)
@@ -34,12 +22,17 @@ library(marquee)
 library(ggbipartite)
 ```
 
+この vignette では、学名付きラベルを読みやすく整形しつつ、 `ggtree` で tip label を綺麗に配置する最小例を示します。
+
+学名部分はすべてダミーデータです。
+
 ## ダミー系統樹とラベルを用意する
 
 ```{r}
 #| label: make-dummy-tree
 set.seed(20260305)
 
+# 学名・マイコビオント表記・ノードサポート値が混在する例示データを作る
 tree_raw <- rtree(10)
 tree_raw$tip.label <- c(
   "Cortinarius-violaceus_AB123456.1",
@@ -73,11 +66,13 @@ tree_rooted <- root(
 #| label: style-labels
 tree_pretty <- tree_rooted
 
+# tip ラベルは一度文字列を掃除してから学名スタイルへ変換
 tree_pretty$tip.label <- tree_rooted$tip.label |>
   str_replace_all("_ORM_", "_(ORM)_") |>
   str_remove("\\.1$") |>
   style_tree_label(last_taxon_rank = "genus")
 
+# ノードラベルは SH-aLRT/Bootstrap の閾値で書式を統一
 tree_pretty$node.label <- format_node_support(
   x = tree_rooted$node.label,
   sh_alrt_cutoff = 80,
@@ -98,8 +93,9 @@ label_preview
 ```{r}
 #| label: practical-label-workflow
 #| eval: false
+# reroot のノード番号は対象 clade に合わせて置き換える
 tree_pretty_from_file <- read.tree("path/to/your_tree.treefile") |>
-  phytools::reroot(node.number = 31) |> # Set root at a target clade.
+  phytools::reroot(node.number = 31) |>
   as_tibble() |>
   mutate(
     label = str_replace_all(
@@ -133,18 +129,14 @@ base_tree <- ggtree(tree_pretty) +
   scale_x_continuous(expand = expansion(mult = c(0.02, 0.55)))
 
 p_unaligned <- base_tree +
-  geom_marquee(
-    data = function(df) {
-      .tiplab_marquee_data_unaligned(df = df, offset = 0)
-    },
-    aes(x = x_lab, y = y, label = label),
+  geom_tipmarquee(
+    align = FALSE,
     hjust = 0,
     size = 3.2,
-    family = "Arial",
-    inherit.aes = FALSE
+    family = "Arial"
   ) +
-  geom_nodelab(
-    aes(label = label),
+  geom_nodemarquee(
+    mapping = aes(label = label),
     hjust = 1,
     vjust = -0.4,
     size = 2.6
@@ -161,28 +153,16 @@ p_unaligned
 #| fig-width: 9
 #| fig-height: 5
 p_aligned <- base_tree +
-  geom_segment(
-    data = function(df) {
-      .tiplab_segment_data(df = df, offset = 0)
-    },
-    aes(x = x, xend = xend, y = y, yend = yend),
-    linetype = "dotted",
-    linewidth = 0.35,
-    colour = "grey45",
-    inherit.aes = FALSE
-  ) +
-  geom_marquee(
-    data = function(df) {
-      .tiplab_marquee_data(df = df, offset = 0)
-    },
-    aes(x = x_lab, y = y, label = label),
+  geom_tipmarquee(
+    align = TRUE,
     hjust = 0,
+    linetype = "dotted",
+    linesize = 0.35,
     size = 3.2,
-    family = "Arial",
-    inherit.aes = FALSE
+    family = "Arial"
   ) +
-  geom_nodelab(
-    aes(label = label),
+  geom_nodemarquee(
+    mapping = aes(label = label),
     hjust = 1,
     vjust = -0.4,
     size = 2.6
@@ -204,25 +184,13 @@ p_aligned
 base_tree_tight <- ggtree(tree_pretty)
 
 p_clipping_control <- base_tree_tight +
-  geom_segment(
-    data = function(df) {
-      .tiplab_segment_data(df = df, offset = 0)
-    },
-    aes(x = x, xend = xend, y = y, yend = yend),
-    linetype = "dotted",
-    linewidth = 0.35,
-    colour = "grey45",
-    inherit.aes = FALSE
-  ) +
-  geom_marquee(
-    data = function(df) {
-      .tiplab_marquee_data(df = df, offset = 0)
-    },
-    aes(x = x_lab, y = y, label = label),
+  geom_tipmarquee(
+    align = TRUE,
     hjust = 0,
+    linetype = "dotted",
+    linesize = 0.35,
     size = 3.2,
-    family = "Arial",
-    inherit.aes = FALSE
+    family = "Arial"
   ) +
   scale_x_continuous(expand = expansion(mult = c(0.02, 0.75))) +
   coord_cartesian(clip = "off")
@@ -240,28 +208,16 @@ p_clipping_control
 #| fig-width: 9
 #| fig-height: 5
 p_reversed <- ggtree(tree_pretty) +
-  geom_segment(
-    data = function(df) {
-      .tiplab_segment_data(df = df, offset = 0)
-    },
-    aes(x = x, xend = xend, y = y, yend = yend),
-    linetype = "dotted",
-    linewidth = 0.35,
-    colour = "grey45",
-    inherit.aes = FALSE
-  ) +
-  geom_marquee(
-    data = function(df) {
-      .tiplab_marquee_data(df = df, offset = 0)
-    },
-    aes(x = x_lab, y = y, label = label),
+  geom_tipmarquee(
+    align = TRUE,
     hjust = 1,
+    linetype = "dotted",
+    linesize = 0.35,
     size = 3.2,
-    family = "Arial",
-    inherit.aes = FALSE
+    family = "Arial"
   ) +
-  geom_nodelab(
-    aes(label = label),
+  geom_nodemarquee(
+    mapping = aes(label = label),
     hjust = 0,
     vjust = -0.4,
     size = 2.6
@@ -350,7 +306,7 @@ tibble(
 簡単な Markdown 解説:
 
 -   学名の主要部分だけに `*...*` を付与し、補助語は通常テキストのまま残します。
--   `geom_marquee()` など Markdown 解釈する layer と相性が良いです。
+-   `geom_tipmarquee()` / `geom_nodemarquee()` など Markdown 解釈する layer と相性が良いです。
 
 ```{r}
 #| label: example-style-sciname

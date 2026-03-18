@@ -7,19 +7,25 @@
 #| include: false
 
 knitr::opts_chunk$set(
-  dev = "ragg_png",
-  dpi = 300
+  dev = "cairo_pdf",
+  dpi = 350
 )
 ```
 
 本編は次の 4 章で進みます。
 
-1.  `ggbipartite` で始める二部ネットワーク可視化
-2.  `ggbipartite` で作る Publishable な系統樹 × 二者ネットワーク図
-3.  学名付きの系統樹ラベルを整える
-4.  Session info（実行環境）
+1.  はじめに
+2.  `ggbipartite` で始める二部ネットワーク可視化
+3.  `ggbipartite` で作る Publishable な系統樹 × 二者ネットワーク図
+4.  学名付きの系統樹ラベルを整える
 
 ```{r}
-# pak::pak("Hide-Fun/ggbipartite")
+# ggbipartite 未導入の場合は事前に pak::pak("Hide-Fun/ggbipartite") を実行
 packageVersion("ggbipartite")
+```
+
+## 実行環境
+
+```{r}
+sessioninfo::session_info()
 ```

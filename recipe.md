@@ -23,10 +23,10 @@ book_contract:
   bibliography: references.bib
   chapters_in_order:
     - index.qmd
+    - session-info.qmd
     - ggbipartite-visualization-ja.qmd
     - ggbipartite-publishable-ja.qmd
     - ggbipartite-sciname-tree-ja.qmd
-    - session-info.qmd
   html:
     theme_chain: [litera, styles-modern.scss]
     toc: true
@@ -76,7 +76,7 @@ doc_index:
   - path: ggbipartite-visualization-ja.qmd
     kind: chapter
     in_book: true
-    order: 2
+    order: 3
     chapter_id: ch1_bipartite_visualization_basics
     loc: 826
     sha256: 0ab3d2662c6031c92171b59b3bf0382266c80612f7a73c90d0cf16191264d52f
@@ -142,7 +142,7 @@ doc_index:
   - path: ggbipartite-publishable-ja.qmd
     kind: chapter
     in_book: true
-    order: 3
+    order: 4
     chapter_id: ch2_publishable_cophylo_figure
     loc: 697
     sha256: 2407a1077c018ad48ddf66aca71d16f301e941d972d94d32ab001ae457ad11a8
@@ -178,10 +178,9 @@ doc_index:
     core_functions:
       - construct_bn_coordination
       - adjust_tree
-      - geom_tiplab
+      - geom_tipmarquee
       - geom_treescale
-      - geom_nodelab
-      - geom_marquee
+      - geom_nodemarquee
       - geom_nodepoint
       - create_link
       - get_yrange
@@ -190,7 +189,7 @@ doc_index:
   - path: ggbipartite-sciname-tree-ja.qmd
     kind: chapter
     in_book: true
-    order: 4
+    order: 5
     chapter_id: ch3_sciname_labeling
     loc: 398
     sha256: 12de49ea4adaaf7e49465fa07021825a078221cf4336005157970457a7dd006c
@@ -232,17 +231,14 @@ doc_index:
       - format_node_support
       - style_sciname
       - root
-      - geom_marquee
-      - geom_nodelab
+      - geom_tipmarquee
+      - geom_nodemarquee
       - scale_x_continuous
       - scale_x_reverse
-      - tiplab_marquee_data
-      - tiplab_marquee_data_unaligned
-      - tiplab_segment_data
   - path: session-info.qmd
     kind: chapter
     in_book: true
-    order: 5
+    order: 2
     chapter_id: ch4_session_info
     loc: 10
     sha256: a876889b7022ce190b5f223d8949e3dc2147b355310f208e018f6350040bc068

@@ -14,15 +14,18 @@ book:
     - ggbipartite-visualization-ja.qmd
     - ggbipartite-publishable-ja.qmd
     - ggbipartite-sciname-tree-ja.qmd
-    - session-info.qmd
 
 bibliography: references.bib
 
 format:
   html:
+    respect-user-color-scheme: true
     theme:
-      - litera
-      - styles-modern.scss
+      light: [itera, styles-modern.scss]
+      dark: [darkly, styles-modern-dark.scss]
+    highlight-style:
+      light: github
+      dark: nord
     toc: true
     toc-depth: 3
     number-sections: false
@@ -31,7 +34,7 @@ format:
     smooth-scroll: true
     anchor-sections: true
     link-external-newwindow: true
-    embed-resources: true
+    # embed-resources: true
     grid:
       sidebar-width: 320px
       body-width: 980px

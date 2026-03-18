@@ -15,14 +15,20 @@ $code-color: #113a61;
 $font-size-base: 1rem;
 
 /*-- scss:rules --*/
-:root {
+body.quarto-light {
   --viz-surface: #ffffff;
   --viz-surface-muted: #f2f6fa;
   --viz-border: #d9e1ea;
   --viz-shadow: 0 16px 36px rgba(22, 34, 53, 0.06);
+  --viz-content-bg-top: #ffffff;
+  --viz-content-bg-bottom: #f6faff;
+  --viz-text: #1a2b3d;
+  --viz-text-soft: #2f445a;
+  --viz-heading: #102a45;
+  --viz-rule: #dbe7f3;
 }
 
-body {
+body.quarto-light {
   line-height: 1.75;
   background:
     radial-gradient(1100px 520px at 105% -20%, #ecf4fb 0%, transparent 58%),
@@ -30,76 +36,146 @@ body {
     #f7f9fc;
 }
 
-#quarto-sidebar {
+/* Keep prose consistently sans-serif in HTML body content. */
+body.quarto-light #quarto-content p,
+body.quarto-light #quarto-content li,
+body.quarto-light #quarto-content dd,
+body.quarto-light #quarto-content dt,
+body.quarto-light #quarto-content th,
+body.quarto-light #quarto-content td,
+body.quarto-light #quarto-content figcaption,
+body.quarto-light #quarto-content caption,
+body.quarto-light #quarto-content blockquote,
+body.quarto-light #quarto-content .callout-title-container,
+body.quarto-light #quarto-content .callout-body-container {
+  font-family: var(--bs-body-font-family);
+}
+
+body.quarto-light #quarto-sidebar {
   background: rgba(255, 255, 255, 0.95);
   border-right: 1px solid var(--viz-border);
 }
 
-.sidebar-title {
+body.quarto-light .sidebar-title {
   font-weight: 800;
   letter-spacing: 0.01em;
 }
 
-.sidebar .sidebar-item .sidebar-link {
+body.quarto-light .sidebar .sidebar-item .sidebar-link {
   border-radius: 0.65rem;
   margin: 0.12rem 0.2rem;
 }
 
-.sidebar .sidebar-item .sidebar-link:hover {
+body.quarto-light .sidebar .sidebar-item .sidebar-link:hover {
   background: #edf3f9;
 }
 
-.sidebar .sidebar-item .sidebar-link.active {
+body.quarto-light .sidebar .sidebar-item .sidebar-link.active {
   background: linear-gradient(90deg, #e3eefb, #eef5fc);
   color: #124c86;
   font-weight: 700;
 }
 
-main.content {
-  background: var(--viz-surface);
+body.quarto-light main.content {
+  background: linear-gradient(180deg, var(--viz-content-bg-top), var(--viz-content-bg-bottom));
   border: 1px solid var(--viz-border);
   border-radius: 1rem;
   box-shadow: var(--viz-shadow);
+  color: var(--viz-text);
   padding: clamp(1rem, 1.8vw, 1.9rem);
 }
 
-#title-block-header {
+body.quarto-light main.content p,
+body.quarto-light main.content li,
+body.quarto-light main.content dd {
+  color: var(--viz-text-soft);
+}
+
+body.quarto-light main.content h2,
+body.quarto-light main.content h3,
+body.quarto-light main.content h4 {
+  color: var(--viz-heading);
+}
+
+body.quarto-light main.content h2,
+body.quarto-light main.content h3 {
+  border-bottom: 1px solid var(--viz-rule);
+  padding-bottom: 0.2rem;
+}
+
+body.quarto-light main.content blockquote {
+  background: #f3f8ff;
+  border-left: 0.28rem solid #7fa7cc;
+  border-radius: 0.5rem;
+  color: #20394f;
+  padding: 0.6rem 0.9rem;
+}
+
+body.quarto-light main.content table thead th {
+  background: #edf3fb;
+  border-bottom: 1px solid #cfdeed;
+}
+
+body.quarto-light main.content table tbody tr:nth-child(even) {
+  background: #f8fbff;
+}
+
+body.quarto-light #title-block-header {
   border-bottom: 1px solid #e3ecf0;
   margin-bottom: 1.1rem;
   padding-bottom: 0.8rem;
 }
 
-.quarto-title h1 {
+body.quarto-light .quarto-title h1 {
   letter-spacing: -0.015em;
 }
 
-.quarto-title .subtitle {
+body.quarto-light .quarto-title .subtitle {
   color: #3a4f66;
   font-weight: 500;
 }
 
-a {
+body.quarto-light a {
   text-decoration-thickness: 1.5px;
   text-underline-offset: 0.16em;
   text-decoration-color: rgba(15, 94, 166, 0.45);
 }
 
-pre.sourceCode,
-div.sourceCode,
-div.cell-output-display {
+body.quarto-light pre.sourceCode,
+body.quarto-light div.sourceCode,
+body.quarto-light div.cell-output-display {
   border: 1px solid #d8e2ee;
   border-radius: 0.8rem;
   background: #fcfdff;
 }
 
-.callout {
+body.quarto-light .cell-output {
+  background-color: #f8f8f8;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+body.quarto-light p code,
+body.quarto-light li code,
+body.quarto-light td code,
+body.quarto-light th code,
+body.quarto-light figcaption code,
+body.quarto-light caption code {
+  background-color: #e8eef6;
+  color: #0f2d4a;
+  border: 1px solid #c9d7e6;
+  padding: 0.15em 0.35em;
+  border-radius: 0.25rem;
+}
+
+body.quarto-light .callout {
   border-left-width: 0.34rem;
   border-radius: 0.8rem;
   background: linear-gradient(180deg, #fbfdff, #f4f8fc);
 }
 
 @media (max-width: 991.98px) {
-  main.content {
+  body.quarto-light main.content {
     border-radius: 0.8rem;
     padding: 1rem;
   }
