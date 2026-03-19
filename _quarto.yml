@@ -5,6 +5,7 @@ project:
 book:
   title: "Visualise cophylogenetic signals"
   subtitle: "Phylogeny x Bipartite Network Workflows"
+  author: "H. Okada"
   page-navigation: true
   search: true
   sidebar:
