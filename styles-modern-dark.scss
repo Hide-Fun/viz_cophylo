@@ -1,10 +1,10 @@
 /*-- scss:defaults --*/
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap");
 
-$primary: #5fb3bd;
-$secondary: #d1946f;
-$body-bg: #0f141b;
-$body-color: #e6edf5;
+$primary: #79b8ff;
+$secondary: #f0a46b;
+$body-bg: #121821;
+$body-color: #d7e0ea;
 $link-color: #8ec7ff;
 $headings-color: #f3f8ff;
 $font-family-sans-serif: "Inter", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", "Meiryo", sans-serif;
@@ -16,18 +16,47 @@ $font-size-base: 1rem;
 
 /*-- scss:rules --*/
 body.quarto-dark {
-  --viz-surface: #151d28;
-  --viz-surface-muted: #101722;
-  --viz-border: #2b3b4f;
-  --viz-shadow: 0 18px 36px rgba(0, 0, 0, 0.35);
+  --viz-surface: #1a2330;
+  --viz-surface-muted: #141c27;
+  --viz-border: #334659;
+  --viz-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+  --viz-content-bg-top: #1d2835;
+  --viz-content-bg-bottom: #17222e;
+  --viz-text: #dde7f1;
+  --viz-text-soft: #c1cfdd;
+  --viz-heading: #f4f8fc;
+  --viz-rule: #385065;
+  --viz-link-underline: rgba(142, 199, 255, 0.55);
+  --viz-inline-code-bg: #213142;
+  --viz-inline-code-border: #36506a;
+  --viz-inline-code-text: #eef6ff;
+  --viz-blockquote-bg: #1a2735;
+  --viz-blockquote-border: #6f98bf;
+  --viz-thead-bg: #1d2b3a;
+  --viz-thead-border: #3a5168;
+  --viz-row-even: #182330;
+  --viz-sidebar-bg: rgba(15, 21, 29, 0.95);
+  --viz-sidebar-hover: #1b2633;
+  --viz-sidebar-active-start: #18314a;
+  --viz-sidebar-active-end: #132637;
+  --viz-sidebar-active-text: #e0efff;
+  --viz-title-border: #2b3b4d;
+  --viz-subtitle: #b9c9d9;
+  --viz-code-border: #3a5269;
+  --viz-code-bg: #0f1b28;
+  --viz-output-bg: #132338;
+  --viz-output-border: #2f4f6f;
+  --viz-output-text: #d9e8f8;
+  --viz-callout-bg-top: #172434;
+  --viz-callout-bg-bottom: #101926;
 }
 
 body.quarto-dark {
   line-height: 1.75;
   background:
-    radial-gradient(1100px 520px at 105% -20%, #112238 0%, transparent 58%),
-    radial-gradient(780px 420px at -8% -20%, #2a1e17 0%, transparent 52%),
-    #0f141b;
+    radial-gradient(1100px 520px at 105% -20%, #17304a 0%, transparent 58%),
+    radial-gradient(780px 420px at -8% -20%, #2f241c 0%, transparent 52%),
+    #121821;
 }
 
 /* Keep prose consistently sans-serif in HTML body content. */
@@ -46,7 +75,7 @@ body.quarto-dark #quarto-content .callout-body-container {
 }
 
 body.quarto-dark #quarto-sidebar {
-  background: rgba(16, 23, 34, 0.94);
+  background: var(--viz-sidebar-bg);
   border-right: 1px solid var(--viz-border);
 }
 
@@ -61,25 +90,61 @@ body.quarto-dark .sidebar .sidebar-item .sidebar-link {
 }
 
 body.quarto-dark .sidebar .sidebar-item .sidebar-link:hover {
-  background: #1f2a3b;
+  background: var(--viz-sidebar-hover);
 }
 
 body.quarto-dark .sidebar .sidebar-item .sidebar-link.active {
-  background: linear-gradient(90deg, #19324b, #16273a);
-  color: #d7ebff;
+  background: linear-gradient(90deg, var(--viz-sidebar-active-start), var(--viz-sidebar-active-end));
+  color: var(--viz-sidebar-active-text);
   font-weight: 700;
 }
 
 body.quarto-dark main.content {
-  background: var(--viz-surface);
+  background: linear-gradient(180deg, var(--viz-content-bg-top), var(--viz-content-bg-bottom));
   border: 1px solid var(--viz-border);
   border-radius: 1rem;
   box-shadow: var(--viz-shadow);
+  color: var(--viz-text);
   padding: clamp(1rem, 1.8vw, 1.9rem);
 }
 
+body.quarto-dark main.content p,
+body.quarto-dark main.content li,
+body.quarto-dark main.content dd {
+  color: var(--viz-text-soft);
+}
+
+body.quarto-dark main.content h2,
+body.quarto-dark main.content h3,
+body.quarto-dark main.content h4 {
+  color: var(--viz-heading);
+}
+
+body.quarto-dark main.content h2,
+body.quarto-dark main.content h3 {
+  border-bottom: 1px solid var(--viz-rule);
+  padding-bottom: 0.2rem;
+}
+
+body.quarto-dark main.content blockquote {
+  background: var(--viz-blockquote-bg);
+  border-left: 0.28rem solid var(--viz-blockquote-border);
+  border-radius: 0.5rem;
+  color: var(--viz-text);
+  padding: 0.6rem 0.9rem;
+}
+
+body.quarto-dark main.content table thead th {
+  background: var(--viz-thead-bg);
+  border-bottom: 1px solid var(--viz-thead-border);
+}
+
+body.quarto-dark main.content table tbody tr:nth-child(even) {
+  background: var(--viz-row-even);
+}
+
 body.quarto-dark #title-block-header {
-  border-bottom: 1px solid #2a3b4e;
+  border-bottom: 1px solid var(--viz-title-border);
   margin-bottom: 1.1rem;
   padding-bottom: 0.8rem;
 }
@@ -89,29 +154,42 @@ body.quarto-dark .quarto-title h1 {
 }
 
 body.quarto-dark .quarto-title .subtitle {
-  color: #b7c9dc;
+  color: var(--viz-subtitle);
   font-weight: 500;
 }
 
 body.quarto-dark a {
   text-decoration-thickness: 1.5px;
   text-underline-offset: 0.16em;
-  text-decoration-color: rgba(142, 199, 255, 0.55);
+  text-decoration-color: var(--viz-link-underline);
 }
 
 body.quarto-dark pre.sourceCode,
-body.quarto-dark div.sourceCode,
-body.quarto-dark div.cell-output-display {
-  border: 1px solid #33495f;
+body.quarto-dark div.sourceCode {
+  border: 1px solid var(--viz-code-border);
   border-radius: 0.8rem;
-  background: #0f1724;
+  background: var(--viz-code-bg);
+}
+
+body.quarto-dark div.cell-output-display {
+  border: 1px solid var(--viz-code-border);
+  border-radius: 0.8rem;
+  background: #FFFFFF;
 }
 
 body.quarto-dark .cell-output {
-  background-color: #101b2b;
-  color: #f8f9fa;
-  padding: 8px;
-  border-radius: 4px;
+  background-color: var(--viz-output-bg);
+  border: 1px solid var(--viz-output-border);
+  color: var(--viz-output-text);
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.55rem;
+}
+
+body.quarto-dark .cell-output pre,
+body.quarto-dark .cell-output code,
+body.quarto-dark .cell-output .ansi-foreground,
+body.quarto-dark .cell-output .ansi-black-fg {
+  color: var(--viz-output-text);
 }
 
 body.quarto-dark p code,
@@ -120,8 +198,9 @@ body.quarto-dark td code,
 body.quarto-dark th code,
 body.quarto-dark figcaption code,
 body.quarto-dark caption code {
-  background-color: #455765;
-  color: #f8f9fa;
+  background-color: var(--viz-inline-code-bg);
+  color: var(--viz-inline-code-text);
+  border: 1px solid var(--viz-inline-code-border);
   padding: 0.15em 0.35em;
   border-radius: 0.25rem;
 }
@@ -129,7 +208,7 @@ body.quarto-dark caption code {
 body.quarto-dark .callout {
   border-left-width: 0.34rem;
   border-radius: 0.8rem;
-  background: linear-gradient(180deg, #162333, #111b29);
+  background: linear-gradient(180deg, var(--viz-callout-bg-top), var(--viz-callout-bg-bottom));
 }
 
 @media (max-width: 991.98px) {

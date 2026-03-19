@@ -26,6 +26,11 @@ body.quarto-light {
   --viz-text-soft: #2f445a;
   --viz-heading: #102a45;
   --viz-rule: #dbe7f3;
+  --viz-code-bg: #393a3b;
+  --viz-code-border: #c8d3e1;
+  --viz-output-bg: #e5ecf4;
+  --viz-output-border: #bccbdd;
+  --viz-output-text: #2e3440;
 }
 
 body.quarto-light {
@@ -142,17 +147,31 @@ body.quarto-light a {
 }
 
 body.quarto-light pre.sourceCode,
-body.quarto-light div.sourceCode,
-body.quarto-light div.cell-output-display {
-  border: 1px solid #d8e2ee;
+body.quarto-light div.sourceCode {
+  border: 1px solid var(--viz-code-border);
   border-radius: 0.8rem;
-  background: #fcfdff;
+  background: var(--viz-code-bg);
+}
+
+body.quarto-light div.cell-output-display {
+  border: 1px solid var(--viz-code-border);
+  border-radius: 0.8rem;
+  background: #FFFFFF;
 }
 
 body.quarto-light .cell-output {
-  background-color: #f8f8f8;
-  padding: 8px;
-  border-radius: 4px;
+  background-color: var(--viz-output-bg);
+  border: 1px solid var(--viz-output-border);
+  color: var(--viz-output-text);
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.55rem;
+}
+
+body.quarto-light .cell-output pre,
+body.quarto-light .cell-output code,
+body.quarto-light .cell-output .ansi-foreground,
+body.quarto-light .cell-output .ansi-black-fg {
+  color: var(--viz-output-text);
 }
 
 body.quarto-light p code,
