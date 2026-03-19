@@ -12,15 +12,15 @@ knitr::opts_chunk$set(
 )
 ```
 
-本編は次の 4 章で進みます。
+本編は次の4章で構成されています。
 
 1.  はじめに
 2.  `ggbipartite` で始める二部ネットワーク可視化
-3.  `ggbipartite` で作る Publishable な系統樹 × 二者ネットワーク図
+3.  `ggbipartite` で作る見た目を整えた系統樹 × 二者ネットワーク図
 4.  学名付きの系統樹ラベルを整える
 
 ```{r}
-# ggbipartite 未導入の場合は事前に pak::pak("Hide-Fun/ggbipartite") を実行
+# Check the installed version for reproducibility; install from GitHub first if missing.
 packageVersion("ggbipartite")
 ```
 

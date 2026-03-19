@@ -18,13 +18,13 @@ library(ggbipartite)
 library(patchwork)
 ```
 
-この vignette は、`ggbipartite` を使った二部ネットワーク可視化を 初心者向けに段階的に解説します。
+このvignetteでは、`ggbipartite` を使った二部ネットワーク可視化を初心者向けに段階的に解説します。
 
-最終的に、次の 4 パターンを自分のデータで再現できる状態を目指します。
+最終的に、次の4パターンを自分のデータで再現できる状態を目指します。
 
 1.  abundance（量）を反映した基本可視化
 2.  メタデータに基づく色分け
-3.  binary（有無）に特化した可視化
+3.  binary に特化した可視化
 4.  系統樹とネットワークの対応づけ
 
 ## まず系統樹を可視化して全体像を掴む
@@ -36,7 +36,7 @@ library(patchwork)
 -   `geom_tiplab()`: tip ラベルを表示します。
 -   `patchwork::plot_layout()`: 2つの tree を横並びで表示します。
 
-最初に `host_phylo` と `symbiont_phylo` を単体で描くと、 「左右どちらがどの生物群か」をイメージしやすくなります。
+最初に `host_phylo` と `symbiont_phylo` を単体で描くと、「左右どちらがどの生物群か」を把握しやすくなります。
 
 ```{r}
 #| label: tree-overview
@@ -72,7 +72,7 @@ if (requireNamespace("patchwork", quietly = TRUE)) {
 
 この章で使う主な関数:
 
--   `get_tip_order()`: tree 上の y 順に tip ラベル順を取得します。
+-   `get_tip_order()`: tree 上の y 順に tip ラベルの順序を取得します。
 -   `base::factor(levels = ...)`: host / symbiont の表示順を固定します。
 -   `arrange()` と `relocate()`: 行列化前の表を順序どおりに並べます。
 -   `column_to_rownames()`: host 列を行名へ変換して行列化します。
@@ -85,7 +85,7 @@ if (requireNamespace("patchwork", quietly = TRUE)) {
 
 ```{r}
 #| label: matrix-alignment
-# 系統樹の tip 順と行列の行列順を明示的にそろえる
+# Keep matrix ordering consistent with tree tip order to avoid misleading panel alignment.
 host_order <- get_tip_order(host_phylo) |> rev()
 symbiont_order <- get_tip_order(symbiont_phylo) |> rev()
 
@@ -147,7 +147,7 @@ glimpse(interaction_df)
 ```
 
 原理的には、行列と系統樹の左右対応が保たれていれば `row` / `column` を逆に定義しても描画は可能です。\
-ただし実務では混乱を避けるため、最初に 「row をどちら側とみなすか」を固定することを推奨します。
+ただし実務では混乱を避けるため、最初に「row をどちら側とみなすか」を固定しておくことを推奨します。
 
 ## abundance の基本可視化
 
@@ -192,10 +192,10 @@ p_abundance <- ggplot(
 p_abundance
 ```
 
-`gap` を未指定にすると `stat_bipnet()` が自動で値を選びます （`sum(count) / 10`、非正の場合は `1`）。\
+`gap` を未指定にすると `stat_bipnet()` が自動で値を選びます（`sum(count) / 10`、0 以下の場合は `1`）。\
 再現性の観点では、`gap` は明示指定するのが安全です。
 
-補足: `geom_bipnet_interaction()` では `type = "interaction"` が既定なので、 通常は省略できます（上のコードも省略形です）。
+補足: `geom_bipnet_interaction()` では `type = "interaction"` が既定値なので、通常は省略できます（上のコードも省略しています）。
 
 ## メタデータで色分けする
 
@@ -209,7 +209,7 @@ p_abundance
 `row` 側だけでなく `column` 側でも同様に色分けできます。\
 さらに同じ考え方で `geom_bipnet_point()` と `geom_bipnet_interaction()` でも色分け可能です。
 
-`after_stat()` を使う理由は、`metadata_row` / `metadata_column` の列が `stat_bipnet()` の計算後にデータへ結合されるためです。 つまり元データ `interaction_df` には存在しない列を 審美属性に使うには `after_stat()` が必要になります。
+`after_stat()` を使う理由は、`metadata_row` / `metadata_column` の列が `stat_bipnet()` の計算後にデータへ結合されるためです。つまり、元データ `interaction_df` に存在しない列を審美属性に使うには `after_stat()` が必要です。
 
 ```{r}
 #| label: metadata-coloring
@@ -288,11 +288,11 @@ ggplot(binary_df, aes(row = row, column = column, count = count)) +
 -   `geom_bipnet_interaction()`: 同じレイアウト引数を共有し、各レイヤーの整合を保ちます。
 -   `stat_bipnet()`: 指定パラメータに基づいて座標を再計算します。
 
-`box_ratio`, `ratio`, `adjust_box_height` は次を調整します。
+`box_ratio`, `ratio`, `adjust_box_height` では、次の項目を調整できます。
 
-1.  `box_ratio`: `sum(count) / box_ratio` でボックス幅を決める。値を大きくするとボックスは細くなる。
-2.  `ratio`: 全体の横方向スケールに影響する。値を小さくすると左右の間隔は広がる傾向がある。
-3.  `adjust_box_height`: `TRUE` で row 側と column 側の総高さを揃えるよう gap を再調整する。
+1.  `box_ratio`: `sum(count) / box_ratio` でボックス幅を決めます。値を大きくするとボックスは細くなります。
+2.  `ratio`: 全体の横方向スケールに影響します。値を小さくすると左右の間隔は広がる傾向があります。
+3.  `adjust_box_height`: `TRUE` にすると、row 側と column 側の総高さが揃うように gap を再調整します。
 
 ```{r}
 #| label: abundance-layout-tuning
@@ -335,7 +335,7 @@ p_abundance_tuned <- ggplot(
 p_abundance_tuned
 ```
 
-## binary（有無）表示に切り替える
+## binary 表示に切り替える
 
 この章で使う主な関数:
 
@@ -397,14 +397,14 @@ p_binary
 -   `compute_box_label_coords()`: ボックス外側ラベルの代表座標を算出します。
 -   `annotate()`: 算出座標を使ってテキスト注釈を描きます。
 
-`construct_bn_coordination()` は通常、 `geom_bipnet_*()` が内部で呼び出している座標計算関数です。\
-ふだんは直接呼ぶ必要はありませんが、 ラベル座標や外部図形（リンク線など）を自作するときには有用です。
+`construct_bn_coordination()` は、`geom_bipnet_*()` が内部で呼び出している座標計算関数です。\
+通常は直接呼ぶ必要はありませんが、ラベル座標や外部図形（リンク線など）を自作するときに役立ちます。
 
 ```{r}
 #| label: label-annotation
 #| fig-width: 10
 #| fig-height: 5
-# 各 geom が使う内部座標を一度明示的に計算して再利用する
+# Compute coordinates once so labels and custom annotations share the same geometry.
 bn_coords <- construct_bn_coordination(
   .mat = interaction_matrix,
   .row = "host",
@@ -488,7 +488,7 @@ ggplot(
 
 ```{r}
 #| label: tree-link-setup
-# tree・link・network で同じ y スケールを使えるように準備する
+# Use a shared y-range so trees, links, and network are visually comparable.
 t_row <- adjust_tree(
   .phylo = host_phylo,
   .box = bn_coords$row_box,
@@ -566,7 +566,7 @@ t_row +
   plot_layout(nrow = 1, widths = c(1, 0.25, 1, 0.25, 1))
 ```
 
-上記のバリエーションとして、tip ラベルを `align = TRUE` で描く版も 用意できます。tip ラベルの x 位置が揃うため、ラベル列の視認性が上がります。
+上記のバリエーションとして、tip ラベルを `align = TRUE` で描く版も用意できます。tip ラベルの x 位置が揃うため、ラベル列の視認性が上がります。
 
 ```{r}
 #| label: tree-link-align-setup
@@ -670,11 +670,11 @@ t_row_align +
 -   `ggtree()`: tip 座標テーブル（`label`, `y`）抽出に使います。
 
 前節では `adjust_tree()` で系統樹をネットワーク側のスケールに合わせました。\
-ここでは逆に、系統樹の tip の y 座標を基準にして ネットワーク側を合わせる方法を示します。この場合は link が不要です。 また、abundance の場合は現実的な調整が難しいため、binary で使う前提です。
+ここでは逆に、系統樹の tip の y 座標を基準にしてネットワーク側を合わせる方法を示します。この方法では link は不要です。また、abundance では現実的な調整が難しいため、binary での利用を前提としています。
 
 ```{r}
 #| label: tree-scale-preserve-setup
-# tip ごとの y 座標を抽出し、binary ネットワークへ直接渡す
+# Reuse tree tip y-positions so the network preserves the original tree scale.
 host_tip_positions <- ggtree(host_phylo)$data |>
   filter(!is.na(isTip) & isTip) |>
   transmute(
@@ -793,11 +793,11 @@ t_row_tree_scale +
 -   `geom_bipnet_point()`
 -   `adjust_tree()` / `create_link()`
 
-`ggbipartite` は、次の順番で使うと安定します。
+`ggbipartite` は、次の手順で使うと安定します。
 
 1.  先に系統樹を描いて左右の意味を固定する
 2.  `factor` と行列ソートで順序を揃える
 3.  `row` / `column` / `count` を明示して基本図を作る
 4.  必要に応じて metadata・binary・系統樹連携へ拡張する
 
-この vignette をテンプレートにすれば、実データにもそのまま移植できます。
+このvignetteをテンプレートにすれば、実データにもそのまま応用できます。

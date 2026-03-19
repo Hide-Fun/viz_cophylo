@@ -1,5 +1,5 @@
 ---
-title: "ggbipartiteで作るPublishableな系統樹×二者ネットワーク図"
+title: "ggbipartiteで作る見た目を整えた系統樹×二者ネットワーク図"
 ---
 
 ## 必要なパッケージ
@@ -17,7 +17,9 @@ library(RPANDA)
 library(ggbipartite)
 ```
 
-この vignette では、`ggbipartite` と `ggtree` を組み合わせて、 投稿図として使いやすい品質の図を作る発展例を示します。
+このvignetteでは、`ggbipartite` と `ggtree` を組み合わせて、見た目と体裁を整えた図を作る発展例を示します。
+
+`marquee` は、Markdown ベースの文字装飾を ggplot レイヤーで扱いやすくするパッケージです。`ggbipartite` では、`ggtree::geom_tiplab()` などを marquee ベースでスタイリングできるように、`geom_tipmarquee()` と `geom_nodemarquee()` を用意しています。
 
 扱う内容:
 
@@ -40,7 +42,7 @@ library(ggbipartite)
 #| label: make-data
 set.seed(20260304)
 
-# 再現可能なデモ用 tree と interaction 行列を生成
+# Use deterministic mock data so figure behavior is easy to compare across runs.
 host_phylo <- rtree(10)
 host_phylo$tip.label <- paste0("Host_", sprintf("%02d", 1:10))
 host_phylo$node.label <- sample(70:100, host_phylo$Nnode, replace = TRUE)
@@ -83,7 +85,7 @@ interaction_matrix <- interaction_matrix_raw[
   drop = FALSE
 ]
 
-# row/column metadata は geoms の after_stat() で参照する
+# Metadata is required here because aesthetics are mapped after stat computation.
 metadata_row <- tibble(
   host = rownames(interaction_matrix),
   host_lineage = c(rep("Lineage_A", 6), rep("Lineage_B", 4))
@@ -163,7 +165,7 @@ host_tree_annotated <- host_tree_base +
 host_tree_annotated
 ```
 
-## marqueeでtip/nodeラベルの見た目を揃える
+## marquee で tip/node ラベルの見た目を揃える
 
 この章で使う主な関数:
 
@@ -173,7 +175,7 @@ host_tree_annotated
 
 以降のコードでは、関数を定義せずに各チャンク内で直接 `adjust_tree()` / `geom_tipmarquee()` / `geom_nodemarquee()` / `geom_treescale()` を組み合わせます。
 
-## abundance版の図を作る
+## abundance 版の図を作る
 
 この章で使う主な関数:
 
@@ -188,7 +190,7 @@ host_tree_annotated
 #| fig-width: 14
 #| fig-height: 5.2
 #| warning: false
-# 各層で同じ gap を使い、tree と network の整合性を保つ
+# Keep one gap value across layers so box and interaction geometry stays aligned.
 gap_abundance <- sum(interaction_matrix) / 12
 
 bn_coords_abundance <- construct_bn_coordination(
@@ -366,7 +368,7 @@ t_host_abundance +
   patchwork::plot_layout(nrow = 1, widths = c(1, 0.28, 1.15, 0.28, 1, 0.2))
 ```
 
-## binary版の図を作る
+## binary 版の図を作る
 
 この章で使う主な関数:
 
@@ -380,7 +382,7 @@ t_host_abundance +
 #| label: binary-publishable-figure
 #| fig-width: 12
 #| fig-height: 5.2
-# tree 由来の tip 座標を binary ネットワークへ直接適用
+# Anchor binary nodes to tree tip coordinates to preserve phylogenetic spacing.
 host_tip_positions <- ggtree(host_phylo)$data |>
   filter(!is.na(.data$isTip) & .data$isTip) |>
   transmute(
@@ -535,7 +537,7 @@ t_host_binary +
   patchwork::plot_layout(nrow = 1, widths = c(1, 1.2, 1))
 ```
 
-## binary + RPANDAシグナルを重ねる（`geom_nodepoint()`）
+## binary + RPANDA シグナルを重ねる（`geom_nodepoint()`）
 
 この章で使う主な関数:
 
@@ -547,7 +549,7 @@ t_host_binary +
 #| label: binary-rpanda-nodepoint
 #| fig-width: 12
 #| fig-height: 5.2
-# `phylosignal_sub_network()` 実行結果を想定したダミー表で可視化手順のみ示す
+# Use mock test results to demonstrate overlay logic without running heavy statistics.
 
 cophylo_by_clade_plants <- tribble(
   ~data_source,
@@ -649,7 +651,7 @@ t_host_binary_signal +
   patchwork::plot_layout(nrow = 1, widths = c(1, 1.2, 1))
 ```
 
-## 出力時の実務メモ
+## 出力時の補足
 
 この章で使う主な関数:
 

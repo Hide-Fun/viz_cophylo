@@ -22,9 +22,9 @@ library(marquee)
 library(ggbipartite)
 ```
 
-この vignette では、学名付きラベルを読みやすく整形しつつ、 `ggtree` で tip label を綺麗に配置する最小例を示します。
+このvignetteでは、学名付きラベルを読みやすく整形しつつ、`ggtree` で tip ラベルをきれいに配置する最小例を示します。学名部分はすべてダミーデータです。
 
-学名部分はすべてダミーデータです。
+`marquee` は、Markdown ベースの文字装飾を ggplot レイヤーで扱いやすくするパッケージです。`ggbipartite` では、`ggtree::geom_tiplab()` などを marquee ベースでスタイリングできるように、`geom_tipmarquee()` と `geom_nodemarquee()` を用意しています。
 
 ## ダミー系統樹とラベルを用意する
 
@@ -32,7 +32,7 @@ library(ggbipartite)
 #| label: make-dummy-tree
 set.seed(20260305)
 
-# 学名・マイコビオント表記・ノードサポート値が混在する例示データを作る
+# Include mixed label patterns so formatting rules can be validated in one dataset.
 tree_raw <- rtree(10)
 tree_raw$tip.label <- c(
   "Cortinarius-violaceus_AB123456.1",
@@ -66,13 +66,13 @@ tree_rooted <- root(
 #| label: style-labels
 tree_pretty <- tree_rooted
 
-# tip ラベルは一度文字列を掃除してから学名スタイルへ変換
+# Normalize raw labels first so italic parsing is stable and predictable.
 tree_pretty$tip.label <- tree_rooted$tip.label |>
   str_replace_all("_ORM_", "_(ORM)_") |>
   str_remove("\\.1$") |>
   style_tree_label(last_taxon_rank = "genus")
 
-# ノードラベルは SH-aLRT/Bootstrap の閾値で書式を統一
+# Apply fixed support thresholds so node labels remain comparable across figures.
 tree_pretty$node.label <- format_node_support(
   x = tree_rooted$node.label,
   sh_alrt_cutoff = 80,
@@ -87,13 +87,13 @@ label_preview <- tibble(
 label_preview
 ```
 
-実務では、系統推定結果を `phylo` として読み込み、 必要なら root を設定したうえで tibble に変換し、 `label` 列を `mutate() + case_when()` で整形してから `phylo` に戻す流れが扱いやすいです。\
-`mycobiont`・サポート値・その他の学名を 1 箇所で分岐できるため、 可視化前の前処理を集約できます。
+実務では、系統推定結果を `phylo` として読み込み、必要に応じて root を設定したうえで tibble に変換し、`label` 列を `mutate() + case_when()` で整形してから `phylo` に戻す流れが扱いやすいです。\
+`mycobiont`・サポート値・その他の学名を1か所で分岐できるため、可視化前の前処理を集約できます。
 
 ```{r}
 #| label: practical-label-workflow
 #| eval: false
-# reroot のノード番号は対象 clade に合わせて置き換える
+# Rerooting is context-specific; replacing this node keeps biological orientation correct.
 tree_pretty_from_file <- read.tree("path/to/your_tree.treefile") |>
   phytools::reroot(node.number = 31) |>
   as_tibble() |>
@@ -117,7 +117,7 @@ tree_pretty_from_file <- read.tree("path/to/your_tree.treefile") |>
   as.phylo()
 ```
 
-この方法だと、`ggtree()` 側では整形済みラベルをそのまま使えるため、 プロット層で文字列処理を書く必要が減り、図コードの可読性が上がります。
+この方法では、`ggtree()` 側で整形済みラベルをそのまま使えるため、プロット層で文字列処理を書く必要が減り、図コードの可読性が上がります。
 
 ## align = FALSE: tipごとにラベルを寄せる
 
@@ -172,9 +172,9 @@ p_aligned <- base_tree +
 p_aligned
 ```
 
-## tipラベルの見切れを防ぐ（`expand = expansion(mult = ...)`）
+## tip ラベルの見切れを防ぐ（`expand = expansion(mult = ...)`）
 
-長い学名で tip ラベルが見切れる場合は、x 軸の `expand` を 明示して余白を確保します。\
+長い学名で tip ラベルが見切れる場合は、x 軸の `expand` を明示して余白を確保します。\
 必要に応じて `coord_cartesian(clip = "off")` も併用します。
 
 ```{r}
@@ -198,9 +198,9 @@ p_clipping_control <- base_tree_tight +
 p_clipping_control
 ```
 
-## `scale_x_reverse()`で左右反転する
+## `scale_x_reverse()` で左右反転する
 
-右側パネル用に系統樹を反転したい場合は、`scale_x_reverse()` を 最後に追加します。\
+右側パネル用に系統樹を反転したい場合は、`scale_x_reverse()` を最後に追加します。\
 反転後は tip ラベルが左側へ出るため、`hjust = 1` と `expand = expansion(mult = c(..., ...))` の下限側調整が有効です。
 
 ```{r}
@@ -235,15 +235,15 @@ p_reversed
 -   `expansion(mult = ...)` の `mult` は、データ範囲に対する相対余白です。
 -   長さ 2 の場合、`c(a, b)` は軸の両端に別々の余白率を指定します。
 -   `c(0.70, 0.02)` は「片側を大きく、反対側を小さく」余白確保する設定です。
--   `scale_x_reverse()` では表示方向が反転するため、この vignette では ラベル側（左側）に広い余白を取り、反対側を最小限にしています。
+-   `scale_x_reverse()` では表示方向が反転するため、このvignetteではラベル側（左側）に広い余白を取り、反対側を最小限にしています。
 
 ### `format_node_support()` の仕様
 
 -   入力は node support の文字ベクトル `x`。
--   2 値形式（例: `"SH/UFBoot"`）では、 `sh_alrt_cutoff` と `boot_cutoff` でそれぞれ判定します。
--   閾値未満の値は `missing_mark` へ置換され、 両方が閾値未満なら空文字 `""` になります。
+-   2 値形式（例: `"SH/UFBoot"`）では、`sh_alrt_cutoff` と `boot_cutoff` でそれぞれ判定します。
+-   閾値未満の値は `missing_mark` へ置換され、両方が閾値未満なら空文字 `""` になります。
 -   1 値形式は `single_value = "ufboot"` または `"sh_alrt"` で解釈できます。
--   `keep_na = TRUE` のときは `NA` を保持し、 `sig_digits` で表示桁数を制御します。
+-   `keep_na = TRUE` のときは `NA` を保持し、`sig_digits` で表示桁数を制御します。
 
 簡単な Markdown 解説:
 
@@ -299,7 +299,7 @@ tibble(
 
 -   入力は学名文字列ベクトル `x`。
 -   属・種などの学名部分を Markdown italic（`*...*`）へ変換します。
--   `cf.`, `aff.`, `nr.` などの同定補助語、 `subsp.`, `var.`, `f.` などの階級語を正規化します。
+-   `cf.`, `aff.`, `nr.` などの同定補助語、`subsp.`, `var.`, `f.` などの階級語を正規化します。
 -   `×` / `x` の交雑表記にも対応します。
 -   数値系ラベル（例: bootstrap 値）は未変換で返します。
 
@@ -323,10 +323,10 @@ tibble(
 )
 ```
 
-## 実務メモ
+## 補足
 
--   系統推定時に `(ORM)` のような括弧付き表記がプログラム側で `_ORM_` へ置換される場合があります。 `style_tree_label()` の前に `str_replace_all()` で `_(ORM)_` 形式へ戻しておくと整形が安定します。
--   support 値は `format_node_support()` で閾値を固定しておくと、 図間比較時の解釈がぶれにくくなります。
+-   系統推定時に `(ORM)` のような括弧付き表記がプログラム側で `_ORM_` へ置換される場合があります。`style_tree_label()` の前に `str_replace_all()` で `_(ORM)_` 形式へ戻しておくと整形が安定します。
+-   support 値は `format_node_support()` で閾値を固定しておくと、図間比較時の解釈がぶれにくくなります。
 -   `offset` を小さく調整すると、狭い図幅でもラベル同士の衝突を減らせます。
--   見切れ対策は `scale_x_*()` の `expand = expansion(mult = c(..., ...))` を 先に調整し、`plot.margin` には依存しない設定にしておくと再利用しやすくなります。
--   反転パネルでは `scale_x_reverse(expand = ...)` と `hjust = 1` をセットで 調整すると、ラベルの位置合わせが安定します。
+-   見切れ対策は `scale_x_*()` の `expand = expansion(mult = c(..., ...))` を先に調整し、`plot.margin` に依存しない設定にしておくと再利用しやすくなります。
+-   反転パネルでは `scale_x_reverse(expand = ...)` と `hjust = 1` をセットで調整すると、ラベルの位置合わせが安定します。
