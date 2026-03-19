@@ -72,12 +72,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet" class="quarto-color-scheme-extra">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-92a838029aa3a6b8b14706539278285b.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-92a838029aa3a6b8b14706539278285b.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-92a838029aa3a6b8b14706539278285b.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-967c24d7cf5064cf55da2140aa233025.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-8b6e0847ec85533c9173a241ae0e1acf.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-967c24d7cf5064cf55da2140aa233025.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-5d61e5a1e67e19e7c0baf04de6e35955.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-1d10a73cee7fe0584287850558c6d56c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-5d61e5a1e67e19e7c0baf04de6e35955.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -331,7 +333,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./ggbipartite-publishable-ja.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">ggbipartiteで作るPublishableな系統樹×二者ネットワーク図</span></a>
+  <a href="./ggbipartite-publishable-ja.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">ggbipartiteで作る見た目を整えた系統樹×二者ネットワーク図</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -385,15 +387,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1 class="unnumbered">はじめに</h1>
 <section id="収録チャプター" class="level2">
 <h2 class="anchored" data-anchor-id="収録チャプター">収録チャプター</h2>
-<p>本編は次の 4 章で進みます。</p>
+<p>本編は次の4章で構成されています。</p>
 <ol type="1">
 <li>はじめに</li>
 <li><code>ggbipartite</code> で始める二部ネットワーク可視化</li>
-<li><code>ggbipartite</code> で作る Publishable な系統樹 × 二者ネットワーク図</li>
+<li><code>ggbipartite</code> で作る見た目を整えた系統樹 × 二者ネットワーク図</li>
 <li>学名付きの系統樹ラベルを整える</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ggbipartite 未導入の場合は事前に pak::pak("Hide-Fun/ggbipartite") を実行</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the installed version for reproducibility; install from GitHub first if missing.</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">packageVersion</span>(<span class="st">"ggbipartite"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] '0.9.6'</code></pre>
@@ -412,11 +414,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  system   aarch64, darwin20
  ui       X11
  language (EN)
- collate  en_US.UTF-8
- ctype    en_US.UTF-8
+ collate  C.UTF-8
+ ctype    C.UTF-8
  tz       Asia/Tokyo
- date     2026-03-18
- pandoc   3.6.3 @ /Applications/RStudio.app/Contents/Resources/app/quarto/bin/tools/aarch64/ (via rmarkdown)
+ date     2026-03-19
+ pandoc   3.6.3 @ /Applications/quarto/bin/tools/ (via rmarkdown)
  quarto   1.7.33 @ /usr/local/bin/quarto
 
 ─ Packages ───────────────────────────────────────────────────────────────────
@@ -431,7 +433,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  knitr         1.50    2025-03-16 [2] CRAN (R 4.5.0)
  rlang         1.1.6   2025-04-11 [2] CRAN (R 4.5.0)
  rmarkdown     2.29    2024-11-04 [2] CRAN (R 4.5.0)
- rstudioapi    0.17.1  2024-10-22 [2] CRAN (R 4.5.0)
  sessioninfo   1.2.3   2025-02-05 [2] CRAN (R 4.5.0)
  xfun          0.53    2025-08-19 [2] CRAN (R 4.5.0)
  yaml          2.3.10  2024-07-26 [2] CRAN (R 4.5.0)

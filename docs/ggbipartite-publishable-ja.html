@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>ggbipartiteで作るPublishableな系統樹×二者ネットワーク図 – Visualise cophylogenetic signals</title>
+<title>ggbipartiteで作る見た目を整えた系統樹×二者ネットワーク図 – Visualise cophylogenetic signals</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -73,12 +73,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet" class="quarto-color-scheme-extra">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-92a838029aa3a6b8b14706539278285b.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-92a838029aa3a6b8b14706539278285b.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-92a838029aa3a6b8b14706539278285b.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-967c24d7cf5064cf55da2140aa233025.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-8b6e0847ec85533c9173a241ae0e1acf.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-967c24d7cf5064cf55da2140aa233025.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-5d61e5a1e67e19e7c0baf04de6e35955.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-1d10a73cee7fe0584287850558c6d56c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-5d61e5a1e67e19e7c0baf04de6e35955.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -291,7 +293,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ggbipartite-publishable-ja.html"><span class="chapter-title">ggbipartiteで作るPublishableな系統樹×二者ネットワーク図</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ggbipartite-publishable-ja.html"><span class="chapter-title">ggbipartiteで作る見た目を整えた系統樹×二者ネットワーク図</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -332,7 +334,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./ggbipartite-publishable-ja.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">ggbipartiteで作るPublishableな系統樹×二者ネットワーク図</span></a>
+  <a href="./ggbipartite-publishable-ja.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">ggbipartiteで作る見た目を整えた系統樹×二者ネットワーク図</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -353,11 +355,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#必要なパッケージ" id="toc-必要なパッケージ" class="nav-link active" data-scroll-target="#必要なパッケージ">必要なパッケージ</a></li>
   <li><a href="#データと系統樹を作る" id="toc-データと系統樹を作る" class="nav-link" data-scroll-target="#データと系統樹を作る">データと系統樹を作る</a></li>
   <li><a href="#系統樹を注釈する" id="toc-系統樹を注釈する" class="nav-link" data-scroll-target="#系統樹を注釈する">系統樹を注釈する</a></li>
-  <li><a href="#marqueeでtipnodeラベルの見た目を揃える" id="toc-marqueeでtipnodeラベルの見た目を揃える" class="nav-link" data-scroll-target="#marqueeでtipnodeラベルの見た目を揃える">marqueeでtip/nodeラベルの見た目を揃える</a></li>
-  <li><a href="#abundance版の図を作る" id="toc-abundance版の図を作る" class="nav-link" data-scroll-target="#abundance版の図を作る">abundance版の図を作る</a></li>
-  <li><a href="#binary版の図を作る" id="toc-binary版の図を作る" class="nav-link" data-scroll-target="#binary版の図を作る">binary版の図を作る</a></li>
-  <li><a href="#binary-rpandaシグナルを重ねるgeom_nodepoint" id="toc-binary-rpandaシグナルを重ねるgeom_nodepoint" class="nav-link" data-scroll-target="#binary-rpandaシグナルを重ねるgeom_nodepoint">binary + RPANDAシグナルを重ねる（<code>geom_nodepoint()</code>）</a></li>
-  <li><a href="#出力時の実務メモ" id="toc-出力時の実務メモ" class="nav-link" data-scroll-target="#出力時の実務メモ">出力時の実務メモ</a></li>
+  <li><a href="#marquee-で-tipnode-ラベルの見た目を揃える" id="toc-marquee-で-tipnode-ラベルの見た目を揃える" class="nav-link" data-scroll-target="#marquee-で-tipnode-ラベルの見た目を揃える">marquee で tip/node ラベルの見た目を揃える</a></li>
+  <li><a href="#abundance-版の図を作る" id="toc-abundance-版の図を作る" class="nav-link" data-scroll-target="#abundance-版の図を作る">abundance 版の図を作る</a></li>
+  <li><a href="#binary-版の図を作る" id="toc-binary-版の図を作る" class="nav-link" data-scroll-target="#binary-版の図を作る">binary 版の図を作る</a></li>
+  <li><a href="#binary-rpanda-シグナルを重ねるgeom_nodepoint" id="toc-binary-rpanda-シグナルを重ねるgeom_nodepoint" class="nav-link" data-scroll-target="#binary-rpanda-シグナルを重ねるgeom_nodepoint">binary + RPANDA シグナルを重ねる（<code>geom_nodepoint()</code>）</a></li>
+  <li><a href="#出力時の補足" id="toc-出力時の補足" class="nav-link" data-scroll-target="#出力時の補足">出力時の補足</a></li>
   </ul>
 </nav>
     </div>
@@ -367,7 +369,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-title">ggbipartiteで作るPublishableな系統樹×二者ネットワーク図</span></h1>
+<h1 class="title"><span class="chapter-title">ggbipartiteで作る見た目を整えた系統樹×二者ネットワーク図</span></h1>
 </div>
 
 
@@ -395,7 +397,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RPANDA)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggbipartite)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>この vignette では、<code>ggbipartite</code> と <code>ggtree</code> を組み合わせて、 投稿図として使いやすい品質の図を作る発展例を示します。</p>
+<p>このvignetteでは、<code>ggbipartite</code> と <code>ggtree</code> を組み合わせて、見た目と体裁を整えた図を作る発展例を示します。</p>
+<p><code>marquee</code> は、Markdown ベースの文字装飾を ggplot レイヤーで扱いやすくするパッケージです。<code>ggbipartite</code> では、<code>ggtree::geom_tiplab()</code> などを marquee ベースでスタイリングできるように、<code>geom_tipmarquee()</code> と <code>geom_nodemarquee()</code> を用意しています。</p>
 <p>扱う内容:</p>
 <ul>
 <li><code>align = TRUE</code> の tip 表示</li>
@@ -417,7 +420,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">20260304</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 再現可能なデモ用 tree と interaction 行列を生成</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Use deterministic mock data so figure behavior is easy to compare across runs.</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>host_phylo <span class="ot">&lt;-</span> <span class="fu">rtree</span>(<span class="dv">10</span>)</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>host_phylo<span class="sc">$</span>tip.label <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Host_"</span>, <span class="fu">sprintf</span>(<span class="st">"%02d"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>))</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>host_phylo<span class="sc">$</span>node.label <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">70</span><span class="sc">:</span><span class="dv">100</span>, host_phylo<span class="sc">$</span>Nnode, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
@@ -481,7 +484,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  drop <span class="ot">=</span> <span class="cn">FALSE</span></span>
 <span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>]</span>
 <span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co"># row/column metadata は geoms の after_stat() で参照する</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Metadata is required here because aesthetics are mapped after stat computation.</span></span>
 <span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>metadata_row <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
 <span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">host =</span> <span class="fu">rownames</span>(interaction_matrix),</span>
 <span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">host_lineage =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">"Lineage_A"</span>, <span class="dv">6</span>), <span class="fu">rep</span>(<span class="st">"Lineage_B"</span>, <span class="dv">4</span>))</span>
@@ -602,8 +605,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="marqueeでtipnodeラベルの見た目を揃える" class="level2">
-<h2 class="anchored" data-anchor-id="marqueeでtipnodeラベルの見た目を揃える">marqueeでtip/nodeラベルの見た目を揃える</h2>
+<section id="marquee-で-tipnode-ラベルの見た目を揃える" class="level2">
+<h2 class="anchored" data-anchor-id="marquee-で-tipnode-ラベルの見た目を揃える">marquee で tip/node ラベルの見た目を揃える</h2>
 <p>この章で使う主な関数:</p>
 <ul>
 <li><code>adjust_tree()</code>: tree を bipartite ボックスへ整列します。</li>
@@ -612,8 +615,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>以降のコードでは、関数を定義せずに各チャンク内で直接 <code>adjust_tree()</code> / <code>geom_tipmarquee()</code> / <code>geom_nodemarquee()</code> / <code>geom_treescale()</code> を組み合わせます。</p>
 </section>
-<section id="abundance版の図を作る" class="level2">
-<h2 class="anchored" data-anchor-id="abundance版の図を作る">abundance版の図を作る</h2>
+<section id="abundance-版の図を作る" class="level2">
+<h2 class="anchored" data-anchor-id="abundance-版の図を作る">abundance 版の図を作る</h2>
 <p>この章で使う主な関数:</p>
 <ul>
 <li><code>construct_bn_coordination()</code>: row / column / interaction 座標を作成します。</li>
@@ -623,7 +626,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>get_yrange()</code>: パネル間の y 軸を統一します。</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 各層で同じ gap を使い、tree と network の整合性を保つ</span></span>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep one gap value across layers so box and interaction geometry stays aligned.</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>gap_abundance <span class="ot">&lt;-</span> <span class="fu">sum</span>(interaction_matrix) <span class="sc">/</span> <span class="dv">12</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>bn_coords_abundance <span class="ot">&lt;-</span> <span class="fu">construct_bn_coordination</span>(</span>
@@ -808,8 +811,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="binary版の図を作る" class="level2">
-<h2 class="anchored" data-anchor-id="binary版の図を作る">binary版の図を作る</h2>
+<section id="binary-版の図を作る" class="level2">
+<h2 class="anchored" data-anchor-id="binary-版の図を作る">binary 版の図を作る</h2>
 <p>この章で使う主な関数:</p>
 <ul>
 <li><code>geom_bipnet_interaction(interaction_type = "binary")</code>: 二値相互作用を線分として描画します。</li>
@@ -819,7 +822,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>ggtree()</code>: 枝長スケールを保持した tree パネルを構築します。</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tree 由来の tip 座標を binary ネットワークへ直接適用</span></span>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Anchor binary nodes to tree tip coordinates to preserve phylogenetic spacing.</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>host_tip_positions <span class="ot">&lt;-</span> <span class="fu">ggtree</span>(host_phylo)<span class="sc">$</span>data <span class="sc">|&gt;</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(.data<span class="sc">$</span>isTip) <span class="sc">&amp;</span> .data<span class="sc">$</span>isTip) <span class="sc">|&gt;</span></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
@@ -1028,8 +1031,8 @@ Picking gap of 3</code></pre>
 </div>
 </div>
 </section>
-<section id="binary-rpandaシグナルを重ねるgeom_nodepoint" class="level2">
-<h2 class="anchored" data-anchor-id="binary-rpandaシグナルを重ねるgeom_nodepoint">binary + RPANDAシグナルを重ねる（<code>geom_nodepoint()</code>）</h2>
+<section id="binary-rpanda-シグナルを重ねるgeom_nodepoint" class="level2">
+<h2 class="anchored" data-anchor-id="binary-rpanda-シグナルを重ねるgeom_nodepoint">binary + RPANDA シグナルを重ねる（<code>geom_nodepoint()</code>）</h2>
 <p>この章で使う主な関数:</p>
 <ul>
 <li><code>phylosignal_sub_network()</code>: clade 単位の相関検定を実行する関数（本章では実行せず参照のみ）。</li>
@@ -1037,7 +1040,7 @@ Picking gap of 3</code></pre>
 <li><code>geom_nodepoint()</code>: 検定結果（<code>mantel_cor</code>）を内部ノードへ重ね描きします。</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># `phylosignal_sub_network()` 実行結果を想定したダミー表で可視化手順のみ示す</span></span>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use mock test results to demonstrate overlay logic without running heavy statistics.</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>cophylo_by_clade_plants <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>data_source,</span>
@@ -1178,8 +1181,8 @@ Picking gap of 3</code></pre>
 </div>
 </div>
 </section>
-<section id="出力時の実務メモ" class="level2">
-<h2 class="anchored" data-anchor-id="出力時の実務メモ">出力時の実務メモ</h2>
+<section id="出力時の補足" class="level2">
+<h2 class="anchored" data-anchor-id="出力時の補足">出力時の補足</h2>
 <p>この章で使う主な関数:</p>
 <ul>
 <li><code>ggsave()</code>: 論文図として保存します。</li>

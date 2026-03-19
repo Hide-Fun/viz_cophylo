@@ -72,12 +72,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet" class="quarto-color-scheme-extra">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-92a838029aa3a6b8b14706539278285b.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-92a838029aa3a6b8b14706539278285b.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-92a838029aa3a6b8b14706539278285b.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-967c24d7cf5064cf55da2140aa233025.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-8b6e0847ec85533c9173a241ae0e1acf.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-967c24d7cf5064cf55da2140aa233025.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-5d61e5a1e67e19e7c0baf04de6e35955.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-1d10a73cee7fe0584287850558c6d56c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-5d61e5a1e67e19e7c0baf04de6e35955.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -331,7 +333,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./ggbipartite-publishable-ja.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">ggbipartiteで作るPublishableな系統樹×二者ネットワーク図</span></a>
+  <a href="./ggbipartite-publishable-ja.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">ggbipartiteで作る見た目を整えた系統樹×二者ネットワーク図</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -354,8 +356,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#学名とサポート値を整形する" id="toc-学名とサポート値を整形する" class="nav-link" data-scroll-target="#学名とサポート値を整形する">学名とサポート値を整形する</a></li>
   <li><a href="#align-false-tipごとにラベルを寄せる" id="toc-align-false-tipごとにラベルを寄せる" class="nav-link" data-scroll-target="#align-false-tipごとにラベルを寄せる">align = FALSE: tipごとにラベルを寄せる</a></li>
   <li><a href="#align-true-補助線を付けて整列する" id="toc-align-true-補助線を付けて整列する" class="nav-link" data-scroll-target="#align-true-補助線を付けて整列する">align = TRUE: 補助線を付けて整列する</a></li>
-  <li><a href="#tipラベルの見切れを防ぐexpand-expansionmult-..." id="toc-tipラベルの見切れを防ぐexpand-expansionmult-..." class="nav-link" data-scroll-target="#tipラベルの見切れを防ぐexpand-expansionmult-...">tipラベルの見切れを防ぐ（<code>expand = expansion(mult = ...)</code>）</a></li>
-  <li><a href="#scale_x_reverseで左右反転する" id="toc-scale_x_reverseで左右反転する" class="nav-link" data-scroll-target="#scale_x_reverseで左右反転する"><code>scale_x_reverse()</code>で左右反転する</a></li>
+  <li><a href="#tip-ラベルの見切れを防ぐexpand-expansionmult-..." id="toc-tip-ラベルの見切れを防ぐexpand-expansionmult-..." class="nav-link" data-scroll-target="#tip-ラベルの見切れを防ぐexpand-expansionmult-...">tip ラベルの見切れを防ぐ（<code>expand = expansion(mult = ...)</code>）</a></li>
+  <li><a href="#scale_x_reverse-で左右反転する" id="toc-scale_x_reverse-で左右反転する" class="nav-link" data-scroll-target="#scale_x_reverse-で左右反転する"><code>scale_x_reverse()</code> で左右反転する</a></li>
   <li><a href="#仕様解説" id="toc-仕様解説" class="nav-link" data-scroll-target="#仕様解説">仕様解説</a>
   <ul class="collapse">
   <li><a href="#expand-expansionmult-c0.70-0.02" id="toc-expand-expansionmult-c0.70-0.02" class="nav-link" data-scroll-target="#expand-expansionmult-c0.70-0.02"><code>expand = expansion(mult = c(0.70, 0.02))</code></a></li>
@@ -363,7 +365,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#style_tree_label-の仕様" id="toc-style_tree_label-の仕様" class="nav-link" data-scroll-target="#style_tree_label-の仕様"><code>style_tree_label()</code> の仕様</a></li>
   <li><a href="#style_sciname-の仕様" id="toc-style_sciname-の仕様" class="nav-link" data-scroll-target="#style_sciname-の仕様"><code>style_sciname()</code> の仕様</a></li>
   </ul></li>
-  <li><a href="#実務メモ" id="toc-実務メモ" class="nav-link" data-scroll-target="#実務メモ">実務メモ</a></li>
+  <li><a href="#補足" id="toc-補足" class="nav-link" data-scroll-target="#補足">補足</a></li>
   </ul>
 </nav>
     </div>
@@ -406,15 +408,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(marquee)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggbipartite)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>この vignette では、学名付きラベルを読みやすく整形しつつ、 <code>ggtree</code> で tip label を綺麗に配置する最小例を示します。</p>
-<p>学名部分はすべてダミーデータです。</p>
+<p>このvignetteでは、学名付きラベルを読みやすく整形しつつ、<code>ggtree</code> で tip ラベルをきれいに配置する最小例を示します。学名部分はすべてダミーデータです。</p>
+<p><code>marquee</code> は、Markdown ベースの文字装飾を ggplot レイヤーで扱いやすくするパッケージです。<code>ggbipartite</code> では、<code>ggtree::geom_tiplab()</code> などを marquee ベースでスタイリングできるように、<code>geom_tipmarquee()</code> と <code>geom_nodemarquee()</code> を用意しています。</p>
 </section>
 <section id="ダミー系統樹とラベルを用意する" class="level2">
 <h2 class="anchored" data-anchor-id="ダミー系統樹とラベルを用意する">ダミー系統樹とラベルを用意する</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">20260305</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 学名・マイコビオント表記・ノードサポート値が混在する例示データを作る</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Include mixed label patterns so formatting rules can be validated in one dataset.</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>tree_raw <span class="ot">&lt;-</span> <span class="fu">rtree</span>(<span class="dv">10</span>)</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>tree_raw<span class="sc">$</span>tip.label <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Cortinarius-violaceus_AB123456.1"</span>,</span>
@@ -447,13 +449,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tree_pretty <span class="ot">&lt;-</span> tree_rooted</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># tip ラベルは一度文字列を掃除してから学名スタイルへ変換</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Normalize raw labels first so italic parsing is stable and predictable.</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>tree_pretty<span class="sc">$</span>tip.label <span class="ot">&lt;-</span> tree_rooted<span class="sc">$</span>tip.label <span class="sc">|&gt;</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_replace_all</span>(<span class="st">"_ORM_"</span>, <span class="st">"_(ORM)_"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_remove</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">.1$"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">style_tree_label</span>(<span class="at">last_taxon_rank =</span> <span class="st">"genus"</span>)</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># ノードラベルは SH-aLRT/Bootstrap の閾値で書式を統一</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply fixed support thresholds so node labels remain comparable across figures.</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>tree_pretty<span class="sc">$</span>node.label <span class="ot">&lt;-</span> <span class="fu">format_node_support</span>(</span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> tree_rooted<span class="sc">$</span>node.label,</span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">sh_alrt_cutoff =</span> <span class="dv">80</span>,</span>
@@ -482,10 +484,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 10 Hebeloma-crustuliniforme_RR789012.1                 *Hebeloma* *crustulinifo…</code></pre>
 </div>
 </div>
-<p>実務では、系統推定結果を <code>phylo</code> として読み込み、 必要なら root を設定したうえで tibble に変換し、 <code>label</code> 列を <code>mutate() + case_when()</code> で整形してから <code>phylo</code> に戻す流れが扱いやすいです。<br>
-<code>mycobiont</code>・サポート値・その他の学名を 1 箇所で分岐できるため、 可視化前の前処理を集約できます。</p>
+<p>実務では、系統推定結果を <code>phylo</code> として読み込み、必要に応じて root を設定したうえで tibble に変換し、<code>label</code> 列を <code>mutate() + case_when()</code> で整形してから <code>phylo</code> に戻す流れが扱いやすいです。<br>
+<code>mycobiont</code>・サポート値・その他の学名を1か所で分岐できるため、可視化前の前処理を集約できます。</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># reroot のノード番号は対象 clade に合わせて置き換える</span></span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rerooting is context-specific; replacing this node keeps biological orientation correct.</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>tree_pretty_from_file <span class="ot">&lt;-</span> <span class="fu">read.tree</span>(<span class="st">"path/to/your_tree.treefile"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  phytools<span class="sc">::</span><span class="fu">reroot</span>(<span class="at">node.number =</span> <span class="dv">31</span>) <span class="sc">|&gt;</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
@@ -508,7 +510,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.phylo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>この方法だと、<code>ggtree()</code> 側では整形済みラベルをそのまま使えるため、 プロット層で文字列処理を書く必要が減り、図コードの可読性が上がります。</p>
+<p>この方法では、<code>ggtree()</code> 側で整形済みラベルをそのまま使えるため、プロット層で文字列処理を書く必要が減り、図コードの可読性が上がります。</p>
 </section>
 <section id="align-false-tipごとにラベルを寄せる" class="level2">
 <h2 class="anchored" data-anchor-id="align-false-tipごとにラベルを寄せる">align = FALSE: tipごとにラベルを寄せる</h2>
@@ -584,9 +586,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="tipラベルの見切れを防ぐexpand-expansionmult-..." class="level2">
-<h2 class="anchored" data-anchor-id="tipラベルの見切れを防ぐexpand-expansionmult-...">tipラベルの見切れを防ぐ（<code>expand = expansion(mult = ...)</code>）</h2>
-<p>長い学名で tip ラベルが見切れる場合は、x 軸の <code>expand</code> を 明示して余白を確保します。<br>
+<section id="tip-ラベルの見切れを防ぐexpand-expansionmult-..." class="level2">
+<h2 class="anchored" data-anchor-id="tip-ラベルの見切れを防ぐexpand-expansionmult-...">tip ラベルの見切れを防ぐ（<code>expand = expansion(mult = ...)</code>）</h2>
+<p>長い学名で tip ラベルが見切れる場合は、x 軸の <code>expand</code> を明示して余白を確保します。<br>
 必要に応じて <code>coord_cartesian(clip = "off")</code> も併用します。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>base_tree_tight <span class="ot">&lt;-</span> <span class="fu">ggtree</span>(tree_pretty)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -620,9 +622,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="scale_x_reverseで左右反転する" class="level2">
-<h2 class="anchored" data-anchor-id="scale_x_reverseで左右反転する"><code>scale_x_reverse()</code>で左右反転する</h2>
-<p>右側パネル用に系統樹を反転したい場合は、<code>scale_x_reverse()</code> を 最後に追加します。<br>
+<section id="scale_x_reverse-で左右反転する" class="level2">
+<h2 class="anchored" data-anchor-id="scale_x_reverse-で左右反転する"><code>scale_x_reverse()</code> で左右反転する</h2>
+<p>右側パネル用に系統樹を反転したい場合は、<code>scale_x_reverse()</code> を最後に追加します。<br>
 反転後は tip ラベルが左側へ出るため、<code>hjust = 1</code> と <code>expand = expansion(mult = c(..., ...))</code> の下限側調整が有効です。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>p_reversed <span class="ot">&lt;-</span> <span class="fu">ggtree</span>(tree_pretty) <span class="sc">+</span></span>
@@ -668,17 +670,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>expansion(mult = ...)</code> の <code>mult</code> は、データ範囲に対する相対余白です。</li>
 <li>長さ 2 の場合、<code>c(a, b)</code> は軸の両端に別々の余白率を指定します。</li>
 <li><code>c(0.70, 0.02)</code> は「片側を大きく、反対側を小さく」余白確保する設定です。</li>
-<li><code>scale_x_reverse()</code> では表示方向が反転するため、この vignette では ラベル側（左側）に広い余白を取り、反対側を最小限にしています。</li>
+<li><code>scale_x_reverse()</code> では表示方向が反転するため、このvignetteではラベル側（左側）に広い余白を取り、反対側を最小限にしています。</li>
 </ul>
 </section>
 <section id="format_node_support-の仕様" class="level3">
 <h3 class="anchored" data-anchor-id="format_node_support-の仕様"><code>format_node_support()</code> の仕様</h3>
 <ul>
 <li>入力は node support の文字ベクトル <code>x</code>。</li>
-<li>2 値形式（例: <code>"SH/UFBoot"</code>）では、 <code>sh_alrt_cutoff</code> と <code>boot_cutoff</code> でそれぞれ判定します。</li>
-<li>閾値未満の値は <code>missing_mark</code> へ置換され、 両方が閾値未満なら空文字 <code>""</code> になります。</li>
+<li>2 値形式（例: <code>"SH/UFBoot"</code>）では、<code>sh_alrt_cutoff</code> と <code>boot_cutoff</code> でそれぞれ判定します。</li>
+<li>閾値未満の値は <code>missing_mark</code> へ置換され、両方が閾値未満なら空文字 <code>""</code> になります。</li>
 <li>1 値形式は <code>single_value = "ufboot"</code> または <code>"sh_alrt"</code> で解釈できます。</li>
-<li><code>keep_na = TRUE</code> のときは <code>NA</code> を保持し、 <code>sig_digits</code> で表示桁数を制御します。</li>
+<li><code>keep_na = TRUE</code> のときは <code>NA</code> を保持し、<code>sig_digits</code> で表示桁数を制御します。</li>
 </ul>
 <p>簡単な Markdown 解説:</p>
 <ul>
@@ -754,7 +756,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li>入力は学名文字列ベクトル <code>x</code>。</li>
 <li>属・種などの学名部分を Markdown italic（<code>*...*</code>）へ変換します。</li>
-<li><code>cf.</code>, <code>aff.</code>, <code>nr.</code> などの同定補助語、 <code>subsp.</code>, <code>var.</code>, <code>f.</code> などの階級語を正規化します。</li>
+<li><code>cf.</code>, <code>aff.</code>, <code>nr.</code> などの同定補助語、<code>subsp.</code>, <code>var.</code>, <code>f.</code> などの階級語を正規化します。</li>
 <li><code>×</code> / <code>x</code> の交雑表記にも対応します。</li>
 <li>数値系ラベル（例: bootstrap 値）は未変換で返します。</li>
 </ul>
@@ -787,14 +789,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 </section>
-<section id="実務メモ" class="level2">
-<h2 class="anchored" data-anchor-id="実務メモ">実務メモ</h2>
+<section id="補足" class="level2">
+<h2 class="anchored" data-anchor-id="補足">補足</h2>
 <ul>
-<li>系統推定時に <code>(ORM)</code> のような括弧付き表記がプログラム側で <code>_ORM_</code> へ置換される場合があります。 <code>style_tree_label()</code> の前に <code>str_replace_all()</code> で <code>_(ORM)_</code> 形式へ戻しておくと整形が安定します。</li>
-<li>support 値は <code>format_node_support()</code> で閾値を固定しておくと、 図間比較時の解釈がぶれにくくなります。</li>
+<li>系統推定時に <code>(ORM)</code> のような括弧付き表記がプログラム側で <code>_ORM_</code> へ置換される場合があります。<code>style_tree_label()</code> の前に <code>str_replace_all()</code> で <code>_(ORM)_</code> 形式へ戻しておくと整形が安定します。</li>
+<li>support 値は <code>format_node_support()</code> で閾値を固定しておくと、図間比較時の解釈がぶれにくくなります。</li>
 <li><code>offset</code> を小さく調整すると、狭い図幅でもラベル同士の衝突を減らせます。</li>
-<li>見切れ対策は <code>scale_x_*()</code> の <code>expand = expansion(mult = c(..., ...))</code> を 先に調整し、<code>plot.margin</code> には依存しない設定にしておくと再利用しやすくなります。</li>
-<li>反転パネルでは <code>scale_x_reverse(expand = ...)</code> と <code>hjust = 1</code> をセットで 調整すると、ラベルの位置合わせが安定します。</li>
+<li>見切れ対策は <code>scale_x_*()</code> の <code>expand = expansion(mult = c(..., ...))</code> を先に調整し、<code>plot.margin</code> に依存しない設定にしておくと再利用しやすくなります。</li>
+<li>反転パネルでは <code>scale_x_reverse(expand = ...)</code> と <code>hjust = 1</code> をセットで調整すると、ラベルの位置合わせが安定します。</li>
 </ul>
 
 
@@ -1220,8 +1222,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./ggbipartite-publishable-ja.html" class="pagination-link" aria-label="ggbipartiteで作るPublishableな系統樹×二者ネットワーク図">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">ggbipartiteで作るPublishableな系統樹×二者ネットワーク図</span></span>
+      <a href="./ggbipartite-publishable-ja.html" class="pagination-link" aria-label="ggbipartiteで作る見た目を整えた系統樹×二者ネットワーク図">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">ggbipartiteで作る見た目を整えた系統樹×二者ネットワーク図</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
