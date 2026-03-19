@@ -192,17 +192,18 @@ body.quarto-dark .cell-output .ansi-black-fg {
   color: var(--viz-output-text);
 }
 
-body.quarto-dark p code,
-body.quarto-dark li code,
-body.quarto-dark td code,
-body.quarto-dark th code,
-body.quarto-dark figcaption code,
-body.quarto-dark caption code {
+body.quarto-dark :not(pre) > code {
   background-color: var(--viz-inline-code-bg);
   color: var(--viz-inline-code-text);
   border: 1px solid var(--viz-inline-code-border);
   padding: 0.15em 0.35em;
   border-radius: 0.25rem;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+body.quarto-dark a > code {
+  color: var(--viz-inline-code-text);
 }
 
 body.quarto-dark .callout {
