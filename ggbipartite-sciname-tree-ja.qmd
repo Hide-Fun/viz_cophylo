@@ -313,7 +313,6 @@ tibble(
 sciname_example <- c(
   "Cremastra aphylla",
   "Cremastra cf. appendiculata",
-  "×Cremastra appendiculata var. variabilis f. alba",
   "88"
 )
 
